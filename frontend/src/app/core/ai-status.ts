@@ -6,10 +6,11 @@ import { SKIP_ERROR_NOTIFICATION } from './problem-detail.interceptor';
 /**
  * - loading: no answer yet
  * - available: the server answered and the AI is configured
- * - key-missing: the server answered and says there is no LLM_API_KEY
+ * - not-configured: the server answered and says the AI is not configured (no LLM_API_KEY, or an incomplete
+ *   openai-compatible setup)
  * - unreachable: the server did not answer, so we do NOT know whether the key is set
  */
-export type AiState = 'loading' | 'available' | 'key-missing' | 'unreachable';
+export type AiState = 'loading' | 'available' | 'not-configured' | 'unreachable';
 
 /** Whether the AI features can be used. Shared by every screen that needs it. */
 @Injectable({ providedIn: 'root' })
@@ -19,10 +20,10 @@ export class AiStatusService {
     context: new HttpContext().set(SKIP_ERROR_NOTIFICATION, true),
   }));
 
-  /** "key-missing" only comes from a real answer of /api/ai/status. */
+  /** "not-configured" only comes from a real answer of /api/ai/status. */
   readonly state = computed<AiState>(() => {
     if (this.status.hasValue()) {
-      return this.status.value().available ? 'available' : 'key-missing';
+      return this.status.value().available ? 'available' : 'not-configured';
     }
     return this.status.error() ? 'unreachable' : 'loading';
   });

@@ -106,14 +106,18 @@ describe('problemDetailInterceptor', () => {
 
   describe('AI errors (the backend sends a "code")', () => {
     it.each([
-      ['AI_KEY_MISSING', 503, 'Le funzioni AI non sono attive: sul server manca la chiave LLM_API_KEY.'],
+      [
+        'AI_KEY_MISSING',
+        503,
+        'Le funzioni AI non sono configurate sul server (LLM_API_KEY; per un servizio openai-compatible anche LLM_BASE_URL e LLM_MODEL).',
+      ],
       [
         'AI_REJECTED',
         503,
         'Il servizio AI ha rifiutato la richiesta. Controlla la chiave e il modello configurati sul server.',
       ],
       ['AI_TEMPORARILY_UNAVAILABLE', 503, 'Il servizio AI è momentaneamente sovraccarico. Riprova tra un minuto.'],
-      ['AI_DAILY_QUOTA_EXHAUSTED', 503, 'Quota giornaliera del servizio AI esaurita: riprova più tardi.'],
+      ['AI_DAILY_QUOTA_EXHAUSTED', 503, 'Quota del servizio AI esaurita: riprova più tardi o controlla il credito.'],
       ['AI_RATE_LIMITED', 503, 'Troppe richieste al servizio AI: riprova tra poco.'],
       ['AI_BAD_ANSWER', 502, 'Il servizio AI ha risposto in modo non utilizzabile. Riprova.'],
     ])('translates %s', (code, status, expected) => {
@@ -142,7 +146,7 @@ describe('problemDetailInterceptor', () => {
       };
 
       expect(answer(32580, 'AI_DAILY_QUOTA_EXHAUSTED')).toBe(
-        'Quota giornaliera del servizio AI esaurita: riprova più tardi (tra circa 9 ore).',
+        'Quota del servizio AI esaurita: riprova più tardi (tra circa 9 ore) o controlla il credito.',
       );
       expect(answer(33, 'AI_RATE_LIMITED')).toBe('Troppe richieste al servizio AI: riprova tra 33 secondi.');
     });

@@ -16,3 +16,4 @@ Each record has the same shape: **Context**, **Decision**, **Alternatives consid
 | [0008](0008-human-in-the-loop-ai.md) | Human-in-the-loop AI: the LLM proposes, a person confirms |
 | [0009](0009-gemini-free-tier-and-synthetic-data.md) | Gemini free tier as LLM provider, and only synthetic data |
 | [0010](0010-angular-spa-behind-nginx.md) | Angular single-page app served by nginx, which proxies the API |
+| [0011](0011-configurable-llm-provider.md) | A configurable LLM provider: Gemini or any OpenAI-compatible service |

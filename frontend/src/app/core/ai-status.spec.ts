@@ -36,15 +36,15 @@ describe('AiStatusService', () => {
     expect(service.available()).toBe(true);
   });
 
-  it('is "key-missing" only when the server really answers that the AI is not available', async () => {
+  it('is "not-configured" only when the server really answers that the AI is not available', async () => {
     backend.expectOne('/api/ai/status').flush({ available: false });
     await settle();
 
-    expect(service.state()).toBe('key-missing');
+    expect(service.state()).toBe('not-configured');
     expect(service.available()).toBe(false);
   });
 
-  it('is "unreachable", NOT "key-missing", when the proxy answers 502', async () => {
+  it('is "unreachable", NOT "not-configured", when the proxy answers 502', async () => {
     backend.expectOne('/api/ai/status').flush('<html>Bad Gateway</html>', { status: 502, statusText: 'Bad Gateway' });
     await settle();
 

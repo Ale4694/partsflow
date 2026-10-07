@@ -23,11 +23,12 @@
         <p><span class="badge badge-success">Disponibile</span></p>
         <p class="muted">Importazione PDF, suggerimenti di abbinamento e assistente sono attivi.</p>
       }
-      @case ('key-missing') {
+      @case ('not-configured') {
         <p><span class="badge">Non disponibile</span></p>
         <p class="muted">
-          Manca la chiave LLM_API_KEY sul server: le funzioni AI sono disattivate, il resto dell’applicazione
-          funziona normalmente.
+          AI non configurata sul server: manca la chiave LLM_API_KEY (con un servizio openai-compatible servono
+          anche LLM_BASE_URL e LLM_MODEL). Le funzioni AI sono disattivate, il resto dell’applicazione funziona
+          normalmente.
         </p>
       }
       @case ('unreachable') {

@@ -12,12 +12,14 @@ export const UNREACHABLE_MESSAGE = 'Il server non è raggiungibile, riprova tra 
 
 /** What to tell the user for each "code" the AI endpoints send (the backend's own text is in English). */
 const AI_MESSAGES: Record<string, (problem: ProblemDetail) => string> = {
-  AI_KEY_MISSING: () => 'Le funzioni AI non sono attive: sul server manca la chiave LLM_API_KEY.',
+  AI_KEY_MISSING: () =>
+    'Le funzioni AI non sono configurate sul server (LLM_API_KEY; per un servizio openai-compatible anche LLM_BASE_URL e LLM_MODEL).',
   AI_REJECTED: () =>
     'Il servizio AI ha rifiutato la richiesta. Controlla la chiave e il modello configurati sul server.',
   AI_DAILY_QUOTA_EXHAUSTED: (problem) =>
-    'Quota giornaliera del servizio AI esaurita: riprova più tardi' +
-    (problem.retryAfterSeconds ? ` (tra ${formatWait(problem.retryAfterSeconds)}).` : '.'),
+    'Quota del servizio AI esaurita: riprova più tardi' +
+    (problem.retryAfterSeconds ? ` (tra ${formatWait(problem.retryAfterSeconds)})` : '') +
+    ' o controlla il credito.',
   AI_RATE_LIMITED: (problem) =>
     'Troppe richieste al servizio AI: ' +
     (problem.retryAfterSeconds ? `riprova tra ${formatWait(problem.retryAfterSeconds)}.` : 'riprova tra poco.'),

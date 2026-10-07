@@ -1,5 +1,7 @@
 # 0009. Gemini free tier as LLM provider, and only synthetic data
 
+> Later: the provider became configurable, see [ADR 0011](0011-configurable-llm-provider.md). Gemini stays the default; the rules about the free tier and synthetic data below apply to every free provider.
+
 ## Context
 
 The AI features need an LLM. This is a public portfolio project that should run for anyone without a credit card or a paid account, and it should not tie the code to one vendor more than necessary.

@@ -50,6 +50,12 @@ Milestones are built in order. Each one ends with a passing `./mvnw verify` and 
 - [x] Frontend unit tests (Vitest) and a frontend job in CI
 - [x] README walkthrough with screenshots, ADR 0010
 
+## M7 — Configurable LLM provider
+- [x] `LLM_PROVIDER` selects Gemini (default) or any OpenAI-compatible service (`LLM_BASE_URL`, `LLM_MODEL`, `LLM_API_KEY`), environment variables only
+- [x] Provider-specific code isolated in `ai.provider` (error translators); the gateway, retry policy and error codes work the same for both
+- [x] Incomplete configuration means "AI not configured" (503), never a startup failure
+- [x] Tests with mocked errors and local fake servers for both providers; README "Choosing the LLM provider" and ADR 0011
+
 ## Later / out of scope for now
 - Signed FatturaPA files (`.p7m`)
 - FatturaPA files containing several documents (several `FatturaElettronicaBody`)

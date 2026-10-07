@@ -6,10 +6,10 @@
   @case ('loading') {
     <p class="loading">Verifica della disponibilità dell’AI…</p>
   }
-  @case ('key-missing') {
+  @case ('not-configured') {
     <p class="banner">
-      <strong>Assistente non disponibile.</strong> Il server non ha una chiave LLM_API_KEY, quindi le funzioni AI
-      sono disattivate. Il resto dell’applicazione funziona normalmente.
+      <strong>Assistente non disponibile.</strong> L’AI non è configurata sul server: manca la chiave LLM_API_KEY (con un servizio openai-compatible servono
+      anche LLM_BASE_URL e LLM_MODEL). Il resto dell’applicazione funziona normalmente.
     </p>
   }
   @case ('unreachable') {

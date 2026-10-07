@@ -132,6 +132,41 @@ curl -s -F file=@src/test/resources/fatturapa/invoice-valid.xml localhost:8080/a
 
 The sample invoice prints two codes on its first line: an EAN barcode and the supplier's own code `RR-BRK-001`. The supplier's code is the one used to identify a line (barcodes are only a fallback), see [ADR 0005](docs/adr/0005-draft-then-confirm-import.md). If you upload the invoice **before** creating the supplier item codes, the lines stay `PENDING_REVIEW`: resolve them (or create the codes and upload again) and the codes are remembered.
 
+## Choosing the LLM provider
+
+The AI features need a language model. Two kinds of provider are supported, chosen **only with environment variables** (nothing is stored in a file; the key is never logged):
+
+| Variable | Meaning | Default |
+| --- | --- | --- |
+| `LLM_PROVIDER` | `gemini` or `openai-compatible` | `gemini` |
+| `LLM_API_KEY` | the key of the service | empty: the AI is off |
+| `LLM_MODEL` | model name | `gemini-3.5-flash` for Gemini; required for `openai-compatible` |
+| `LLM_BASE_URL` | address of the service, **including its version path** (usually ending in `/v1`) | only for `openai-compatible`, required there |
+
+**Gemini** (Google AI Studio key; the default):
+
+```bash
+export LLM_API_KEY=...                  # your own key
+# export LLM_MODEL=gemini-2.5-flash     # optional: another model has its own daily allowance
+docker compose up --build
+```
+
+**Any OpenAI-compatible service** (OpenAI, Mistral, Groq, DeepSeek, OpenRouter, a local server...):
+
+```bash
+export LLM_PROVIDER=openai-compatible
+export LLM_BASE_URL=https://api.mistral.ai/v1        # or https://api.groq.com/openai/v1, https://openrouter.ai/api/v1 ...
+export LLM_MODEL=mistral-small-latest                # the model name as the service writes it
+export LLM_API_KEY=...                               # your own key
+docker compose up --build
+```
+
+Model names change often, so check the service's documentation. Pick a model that supports **tool calling** (the assistant uses it) and returns JSON when asked (PDF import and matching). The OpenAI-compatible path has been exercised in tests against a local fake server, not against a live service.
+
+If something is missing (no key, or no address or model for `openai-compatible`) the application still starts: the AI endpoints answer `503`, the UI says the AI is not configured, and everything else works. Rate limits, an exhausted quota or credit, an invalid key or a wrong model name are reported with the same error codes for both kinds of provider (see [ADR 0011](docs/adr/0011-configurable-llm-provider.md)).
+
+**Privacy.** Whatever you send reaches the provider. Free tiers (Gemini's, and most free plans of other services) may use your prompts to improve their models, so use **only synthetic data** there, as this repository does. For real supplier documents use a paid plan whose terms exclude training, or a model you host yourself.
+
 ## Web interface
 
 Open **http://localhost:8081** after `docker compose up --build`. The sidebar has six screens (labels are in Italian):
@@ -239,6 +274,7 @@ The reasoning behind each choice, with the alternatives that were considered, is
 8. [Human-in-the-loop AI](docs/adr/0008-human-in-the-loop-ai.md)
 9. [Gemini free tier, and why only synthetic data](docs/adr/0009-gemini-free-tier-and-synthetic-data.md)
 10. [Angular single-page app behind an nginx reverse proxy](docs/adr/0010-angular-spa-behind-nginx.md)
+11. [A configurable LLM provider](docs/adr/0011-configurable-llm-provider.md)
 
 In short: deterministic code for everything that follows fixed rules (XML parsing, totals, stock arithmetic); the LLM only where judgment is needed (reading a messy PDF, deciding whether two product descriptions are the same part); and a person always in the loop before the inventory changes.
 
