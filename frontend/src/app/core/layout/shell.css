@@ -1,0 +1,91 @@
+.shell {
+  display: grid;
+  grid-template-columns: 14rem 1fr;
+  min-height: 100vh;
+}
+
+.sidebar {
+  background: var(--color-sidebar);
+  color: var(--color-sidebar-text);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.125rem;
+  text-decoration: none;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius);
+  background: var(--color-primary);
+  font-size: 0.8rem;
+}
+
+nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+nav a {
+  color: var(--color-sidebar-text);
+  text-decoration: none;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius);
+}
+
+nav a:hover {
+  background: rgb(255 255 255 / 0.08);
+}
+
+nav a.active {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.sidebar-note {
+  margin-top: auto;
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+.content {
+  padding: var(--space-6);
+  max-width: 72rem;
+  width: 100%;
+}
+
+@media (max-width: 800px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    position: static;
+    height: auto;
+  }
+  nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .sidebar-note {
+    display: none;
+  }
+  .content {
+    padding: var(--space-4);
+  }
+}

@@ -1,0 +1,27 @@
+<div class="shell">
+  <aside class="sidebar">
+    <a class="brand" routerLink="/">
+      <span class="brand-mark">PF</span>
+      <span>partsflow</span>
+    </a>
+    <nav aria-label="Menu principale">
+      @for (link of links; track link.path) {
+        <a
+          [routerLink]="link.path"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: link.path === '/' }"
+        >
+          {{ link.label }}
+        </a>
+      }
+    </nav>
+    <p class="sidebar-note">Dati di esempio: aziende e partite IVA sono inventate.</p>
+  </aside>
+
+  <main class="content">
+    <router-outlet />
+  </main>
+</div>
+
+<app-notifications />
+<app-confirm-dialog />
