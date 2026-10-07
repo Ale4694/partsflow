@@ -41,7 +41,18 @@ Milestones are built in order. Each one ends with a passing `./mvnw verify` and 
 - [x] README with Mermaid architecture diagram, one-command run, API overview, design decisions, CI badge
 - [x] Architecture Decision Records in `docs/adr/`
 
+## M6 — Angular web frontend
+- [x] Angular 22 app in `frontend/` (standalone components, signals, zoneless, reactive forms, `httpResource`, lazy routes), UI in Italian
+- [x] Dashboard, suppliers (with item codes), items with stock, warehouse movements, imports (draft review, resolve/skip/confirm/discard), AI assistant
+- [x] One error interceptor turns ProblemDetail responses into messages; confirmation dialog before destructive actions
+- [x] Small backend additions for the UI: stock overview endpoint, item search, item code on movements
+- [x] nginx image serving the app and proxying `/api/`; `web` service in `compose.yaml` (port 8081)
+- [x] Frontend unit tests (Vitest) and a frontend job in CI
+- [x] README walkthrough with screenshots, ADR 0010
+
 ## Later / out of scope for now
 - Signed FatturaPA files (`.p7m`)
 - FatturaPA files containing several documents (several `FatturaElettronicaBody`)
 - Document-level discounts and non-EUR currencies in FatturaPA import
+- Authentication and user roles for the web interface
+- End-to-end browser tests (Playwright) for the web interface

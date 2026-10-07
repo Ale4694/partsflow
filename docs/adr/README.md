@@ -15,3 +15,4 @@ Each record has the same shape: **Context**, **Decision**, **Alternatives consid
 | [0007](0007-pg-trgm-instead-of-embeddings.md) | pg_trgm instead of embeddings to find candidate items |
 | [0008](0008-human-in-the-loop-ai.md) | Human-in-the-loop AI: the LLM proposes, a person confirms |
 | [0009](0009-gemini-free-tier-and-synthetic-data.md) | Gemini free tier as LLM provider, and only synthetic data |
+| [0010](0010-angular-spa-behind-nginx.md) | Angular single-page app served by nginx, which proxies the API |
