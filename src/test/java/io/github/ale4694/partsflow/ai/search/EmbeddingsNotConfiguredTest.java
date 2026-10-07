@@ -27,6 +27,19 @@ class EmbeddingsNotConfiguredTest {
 	FakeEmbeddingModel model;
 	@Autowired
 	ItemEmbeddingIndexer indexer;
+	@Autowired
+	ItemSearchService search;
+
+	@Test
+	void searchFallsBackToTextAndSaysItIsNotConfigured() {
+		model.reset();
+
+		ItemSearchService.SearchResult result = search.search("filtro olio", 5, true);
+
+		assertThat(result.mode()).isEqualTo(ItemSearchService.Mode.TEXT);
+		assertThat(result.fallbackReason()).isEqualTo(ItemSearchService.FallbackReason.NOT_CONFIGURED);
+		assertThat(model.batchSizes()).isEmpty();
+	}
 
 	@Test
 	void itemsSaveWithoutEmbeddingsAndTheIndexerReportsNotConfigured() throws Exception {

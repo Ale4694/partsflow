@@ -36,6 +36,19 @@ class EmbeddingDimensionMismatchTest {
 	ItemEmbeddingIndexer indexer;
 	@Autowired
 	FakeEmbeddingModel model;
+	@Autowired
+	ItemSearchService search;
+
+	@Test
+	void searchFallsBackToTextAndSaysWhy() {
+		model.reset();
+
+		ItemSearchService.SearchResult result = search.search("filtro olio", 5, true);
+
+		assertThat(result.mode()).isEqualTo(ItemSearchService.Mode.TEXT);
+		assertThat(result.fallbackReason()).isEqualTo(ItemSearchService.FallbackReason.DIMENSION_MISMATCH);
+		assertThat(model.batchSizes()).isEmpty();
+	}
 
 	@Test
 	void theGuardDetectsItAndTheIndexerStops() {
