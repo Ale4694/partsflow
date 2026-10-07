@@ -30,6 +30,7 @@ import io.github.ale4694.partsflow.invoiceimport.xml.FatturaPaParser;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.time.Clock;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +46,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ImportService {
 
+	/** The reason and the source document columns are 200 characters long. */
 	private static final int MAX_SOURCE_DOCUMENT_LENGTH = 200;
+	private static final DateTimeFormatter DOCUMENT_DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
 	private final FatturaPaParser parser;
 	private final SupplierRepository suppliers;
@@ -193,15 +196,34 @@ public class ImportService {
 		drafts.delete(draft);
 	}
 
+	/**
+	 * The movement texts are shown to the (Italian) user in the warehouse history, so they are in Italian:
+	 * reason "Carico da fattura FT-0001/2026 di Ricambi Rossi Srl", source "TD01 FT-0001/2026 del 10/03/2026".
+	 * Only new movements get these texts; existing rows are not touched.
+	 */
 	private StockMovementRequest toMovement(ImportDraft draft, ImportDraftLine line) {
 		BigDecimal delta = line.getStockDelta();
-		String source = (draft.getTipoDocumento() + " " + draft.getDocumentNumber() + " of " + draft.getDocumentDate()
-				+ " from " + draft.getSupplier().getName());
-		if (source.length() > MAX_SOURCE_DOCUMENT_LENGTH) {
-			source = source.substring(0, MAX_SOURCE_DOCUMENT_LENGTH);
-		}
-		return new StockMovementRequest(line.getItem().getId(), delta.signum() > 0 ? MovementType.IN : MovementType.OUT,
-				delta.abs(), "Confirmed supplier document import", source);
+		MovementType type = delta.signum() > 0 ? MovementType.IN : MovementType.OUT;
+		String reason = (type == MovementType.IN ? "Carico da " : "Scarico per ") + documentKind(draft.getTipoDocumento())
+				+ " " + draft.getDocumentNumber() + " di " + draft.getSupplier().getName();
+		String source = draft.getTipoDocumento() + " " + draft.getDocumentNumber() + " del "
+				+ DOCUMENT_DATE.format(draft.getDocumentDate());
+		return new StockMovementRequest(line.getItem().getId(), type, delta.abs(), truncate(reason),
+				truncate(source));
+	}
+
+	/** Italian name of the kind of document (the movement reason is built from it). */
+	private static String documentKind(String tipoDocumento) {
+		return switch (tipoDocumento) {
+			case "TD01", "TD24" -> "fattura";
+			case "TD04" -> "nota di credito";
+			case "DDT" -> "DDT";
+			default -> "documento";
+		};
+	}
+
+	private static String truncate(String text) {
+		return text.length() <= MAX_SOURCE_DOCUMENT_LENGTH ? text : text.substring(0, MAX_SOURCE_DOCUMENT_LENGTH);
 	}
 
 	private ImportDraft openDraft(Long draftId) {

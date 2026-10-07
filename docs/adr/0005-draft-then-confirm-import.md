@@ -27,6 +27,6 @@ Safety rules around it:
 
 ## Consequences
 
-- The inventory only changes through a deliberate, auditable action; the movement carries the source document (`TD01 FT-0001/2026 of 2026-03-10 from Ricambi Rossi Srl`).
+- The inventory only changes through a deliberate, auditable action; the movement carries its reason (`Carico da fattura FT-0001/2026 di Ricambi Rossi Srl`; `Scarico per nota di credito ...` for a credit note) and the source document (`TD01 FT-0001/2026 del 10/03/2026`), in Italian because the warehouse history is shown to the user as written.
 - One extra API call (confirm) per import and some extra tables.
 - The same draft mechanism serves the AI features (ADR 0008): a PDF read by the LLM becomes a draft like any other.

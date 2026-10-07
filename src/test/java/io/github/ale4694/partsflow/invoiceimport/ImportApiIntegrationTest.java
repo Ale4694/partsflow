@@ -163,8 +163,10 @@ class ImportApiIntegrationTest {
 		mvc.perform(get("/api/inventory/movements?itemId=" + brakePads.getId()))
 				.andExpect(jsonPath("$.totalElements").value(1))
 				.andExpect(jsonPath("$.content[0].type").value("IN"))
-				.andExpect(jsonPath("$.content[0].sourceDocument").value(
-						Matchers.startsWith("TD01 " + vat + "-invoice-valid.xml of 2026-03-10")));
+				.andExpect(jsonPath("$.content[0].reason").value("Carico da fattura " + vat
+						+ "-invoice-valid.xml di Ricambi Rossi Srl"))
+				.andExpect(jsonPath("$.content[0].sourceDocument").value("TD01 " + vat
+						+ "-invoice-valid.xml del 10/03/2026"));
 
 		// confirming again must not double the stock
 		mvc.perform(post("/api/imports/" + draftId + "/confirm")).andExpect(status().isConflict());
@@ -273,7 +275,9 @@ class ImportApiIntegrationTest {
 		assertThat(stockOf(brakePads)).isEqualTo(3.0);
 		mvc.perform(get("/api/inventory/movements?itemId=" + brakePads.getId() + "&sort=id,desc"))
 				.andExpect(jsonPath("$.content[0].type").value("OUT"))
-				.andExpect(jsonPath("$.content[0].quantity").value(2));
+				.andExpect(jsonPath("$.content[0].quantity").value(2))
+				.andExpect(jsonPath("$.content[0].reason").value(Matchers.startsWith("Scarico per nota di credito ")))
+				.andExpect(jsonPath("$.content[0].sourceDocument").value(Matchers.startsWith("TD04 ")));
 	}
 
 	@Test
