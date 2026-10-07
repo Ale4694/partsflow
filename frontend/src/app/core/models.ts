@@ -15,6 +15,8 @@ export interface ProblemDetail {
   status?: number;
   detail?: string;
   instance?: string;
+  /** Stable machine-readable reason, sent by the AI endpoints (AI_KEY_MISSING, AI_REJECTED...). */
+  code?: string;
 }
 
 // ---- catalog ----

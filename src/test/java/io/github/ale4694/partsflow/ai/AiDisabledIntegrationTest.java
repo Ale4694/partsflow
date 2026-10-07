@@ -33,7 +33,8 @@ class AiDisabledIntegrationTest {
 				.content("{\"question\": \"How much brake fluid do we have?\"}"))
 				.andExpect(status().isServiceUnavailable())
 				.andExpect(jsonPath("$.status").value(503))
-				.andExpect(jsonPath("$.detail").value(org.hamcrest.Matchers.containsString("LLM_API_KEY")));
+				.andExpect(jsonPath("$.detail").value(org.hamcrest.Matchers.containsString("LLM_API_KEY")))
+				.andExpect(jsonPath("$.code").value("AI_KEY_MISSING"));
 
 		mvc.perform(multipart("/api/ai/imports/pdf")
 				.file(new MockMultipartFile("file", "invoice.pdf", "application/pdf", new byte[] {1, 2, 3})))

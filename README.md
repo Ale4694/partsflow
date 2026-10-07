@@ -214,7 +214,7 @@ Interactive documentation: Swagger UI at `/swagger-ui.html`, OpenAPI JSON at `/v
 | `POST /api/ai/suggestions/{id}/accept` / `reject` | Decide on a suggestion |
 | `POST /api/ai/assistant` | Ask a question about stock in plain language |
 
-Errors are always [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) `application/problem+json`:
+Errors are always [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) `application/problem+json`. The AI endpoints add a stable `code` field (`AI_KEY_MISSING`, `AI_REJECTED`, `AI_TEMPORARILY_UNAVAILABLE`, `AI_BAD_ANSWER`) that the web interface uses to show its own message:
 
 | Status | Meaning |
 | --- | --- |
@@ -223,7 +223,7 @@ Errors are always [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) `applicatio
 | `409` | Conflict with current data: duplicate, insufficient stock, document already imported or confirmed, lines still pending review |
 | `422` | Readable, but breaks a business rule: totals do not add up, unsupported document type, unknown supplier VAT number |
 | `502` | The LLM answered with something unusable |
-| `503` | The AI features are unavailable: no API key, or the free-tier quota is exhausted |
+| `503` | The AI features are unavailable: no API key, request rejected by the provider, or the free-tier quota is exhausted |
 
 ## Design decisions
 

@@ -129,11 +129,13 @@ class PdfImportIntegrationTest extends AiIntegrationTestBase {
 	@Test
 	void whenTheLlmIsUnavailableTheClientGetsA503() throws Exception {
 		when(gateway.structured(eq("pdf-extraction"), any(), any(), eq(ExtractedDocument.class)))
-				.thenThrow(new AiUnavailableException("The LLM is rate limited or temporarily unavailable."));
+				.thenThrow(new AiUnavailableException(AiUnavailableException.Reason.TEMPORARILY_UNAVAILABLE,
+						"The LLM is rate limited or temporarily unavailable."));
 
 		upload(pdf()).andExpect(status().isServiceUnavailable())
 				.andExpect(jsonPath("$.status").value(503))
-				.andExpect(jsonPath("$.detail").value(org.hamcrest.Matchers.containsString("rate limited")));
+				.andExpect(jsonPath("$.detail").value(org.hamcrest.Matchers.containsString("rate limited")))
+				.andExpect(jsonPath("$.code").value("AI_TEMPORARILY_UNAVAILABLE"));
 	}
 
 	@Test

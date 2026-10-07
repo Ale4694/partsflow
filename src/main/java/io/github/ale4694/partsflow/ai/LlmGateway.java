@@ -47,7 +47,8 @@ public class LlmGateway {
 	/** Fails fast with a 503 when there is no API key, so callers can skip work that would be wasted. */
 	public void requireConfigured() {
 		if (!configured) {
-			throw new AiUnavailableException("AI features are disabled: the LLM_API_KEY environment variable is not set");
+			throw new AiUnavailableException(AiUnavailableException.Reason.KEY_MISSING,
+					"AI features are disabled: the LLM_API_KEY environment variable is not set");
 		}
 	}
 
@@ -96,11 +97,13 @@ public class LlmGateway {
 					throw ex; // anything else is a bug on our side, let it surface as a 500
 				}
 				if (!temporary) {
-					throw new AiUnavailableException("The LLM rejected the request (HTTP " + apiError.code()
-							+ "). Check the API key and model configuration.", ex);
+					throw new AiUnavailableException(AiUnavailableException.Reason.REJECTED,
+							"The LLM rejected the request (HTTP " + apiError.code()
+									+ "). Check the API key and model configuration; the server log has the provider's message.",
+							ex);
 				}
 				if (attempt >= retry.maxAttempts()) {
-					throw new AiUnavailableException(
+					throw new AiUnavailableException(AiUnavailableException.Reason.TEMPORARILY_UNAVAILABLE,
 							"The LLM is rate limited or temporarily unavailable. Please try again in a minute.", ex);
 				}
 				sleep(backoffMillis);
@@ -120,7 +123,8 @@ public class LlmGateway {
 		}
 		catch (InterruptedException ex) {
 			Thread.currentThread().interrupt();
-			throw new AiUnavailableException("Interrupted while waiting to retry the LLM call", ex);
+			throw new AiUnavailableException(AiUnavailableException.Reason.TEMPORARILY_UNAVAILABLE,
+					"Interrupted while waiting to retry the LLM call", ex);
 		}
 	}
 

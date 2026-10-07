@@ -15,17 +15,28 @@
 
   <section class="card">
     <h2>Intelligenza artificiale</h2>
-    @if (ai.loading()) {
-      <p class="muted">Verifica in corso…</p>
-    } @else if (ai.available()) {
-      <p><span class="badge badge-success">Disponibile</span></p>
-      <p class="muted">Importazione PDF, suggerimenti di abbinamento e assistente sono attivi.</p>
-    } @else {
-      <p><span class="badge">Non disponibile</span></p>
-      <p class="muted">
-        Manca la chiave LLM_API_KEY sul server: le funzioni AI sono disattivate, il resto dell’applicazione funziona
-        normalmente.
-      </p>
+    @switch (ai.state()) {
+      @case ('loading') {
+        <p class="muted">Verifica in corso…</p>
+      }
+      @case ('available') {
+        <p><span class="badge badge-success">Disponibile</span></p>
+        <p class="muted">Importazione PDF, suggerimenti di abbinamento e assistente sono attivi.</p>
+      }
+      @case ('key-missing') {
+        <p><span class="badge">Non disponibile</span></p>
+        <p class="muted">
+          Manca la chiave LLM_API_KEY sul server: le funzioni AI sono disattivate, il resto dell’applicazione
+          funziona normalmente.
+        </p>
+      }
+      @case ('unreachable') {
+        <p><span class="badge badge-danger">Server non raggiungibile</span></p>
+        <p class="muted">
+          Non riesco a contattare il server, quindi non so se l’AI è attiva. Riprova tra qualche secondo.
+        </p>
+        <button type="button" class="btn btn-small" (click)="ai.retry()">Riprova</button>
+      }
     }
   </section>
 </div>

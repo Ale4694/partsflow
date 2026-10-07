@@ -82,7 +82,8 @@ class LlmGatewayTest {
 		assertThat(disabled.isConfigured()).isFalse();
 		assertThatThrownBy(() -> disabled.structured("test-op", "s", "u", Answer.class))
 				.isInstanceOf(AiUnavailableException.class)
-				.hasMessageContaining("LLM_API_KEY");
+				.hasMessageContaining("LLM_API_KEY")
+				.extracting(e -> ((AiUnavailableException) e).reason()).isEqualTo(AiUnavailableException.Reason.KEY_MISSING);
 		assertThatThrownBy(() -> disabled.converse("test-op", "s", "u", new Object()))
 				.isInstanceOf(AiUnavailableException.class);
 		verifyNoInteractions(model);
@@ -105,7 +106,9 @@ class LlmGatewayTest {
 
 		assertThatThrownBy(this::ask)
 				.isInstanceOf(AiUnavailableException.class)
-				.hasMessageContaining("rate limited");
+				.hasMessageContaining("rate limited")
+				.extracting(e -> ((AiUnavailableException) e).reason())
+				.isEqualTo(AiUnavailableException.Reason.TEMPORARILY_UNAVAILABLE);
 		verify(model, times(3)).call(any(Prompt.class));
 	}
 
@@ -115,7 +118,8 @@ class LlmGatewayTest {
 
 		assertThatThrownBy(this::ask)
 				.isInstanceOf(AiUnavailableException.class)
-				.hasMessageContaining("HTTP 401");
+				.hasMessageContaining("HTTP 401")
+				.extracting(e -> ((AiUnavailableException) e).reason()).isEqualTo(AiUnavailableException.Reason.REJECTED);
 		verify(model, times(1)).call(any(Prompt.class));
 	}
 

@@ -2,13 +2,23 @@
   <h1>Assistente</h1>
 </header>
 
-@if (ai.loading()) {
-  <p class="loading">Verifica della disponibilità dell’AI…</p>
-} @else if (!ai.available()) {
-  <p class="banner">
-    <strong>Assistente non disponibile.</strong> Il server non ha una chiave LLM_API_KEY, quindi le funzioni AI sono
-    disattivate. Il resto dell’applicazione funziona normalmente.
-  </p>
+@switch (ai.state()) {
+  @case ('loading') {
+    <p class="loading">Verifica della disponibilità dell’AI…</p>
+  }
+  @case ('key-missing') {
+    <p class="banner">
+      <strong>Assistente non disponibile.</strong> Il server non ha una chiave LLM_API_KEY, quindi le funzioni AI
+      sono disattivate. Il resto dell’applicazione funziona normalmente.
+    </p>
+  }
+  @case ('unreachable') {
+    <p class="banner banner-error">
+      <strong>Il server non è raggiungibile, riprova tra qualche secondo.</strong> Finché non risponde non so se
+      l’assistente è disponibile.
+      <button type="button" class="btn btn-small" (click)="ai.retry()">Riprova</button>
+    </p>
+  }
 }
 
 <section class="card chat">
