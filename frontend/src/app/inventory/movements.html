@@ -1,0 +1,115 @@
+<header class="page-header">
+  <h1>Magazzino</h1>
+</header>
+
+<section class="card">
+  <h2>Registra un movimento</h2>
+  <form [formGroup]="form" (ngSubmit)="save()">
+    <div class="form-grid">
+      <div class="field">
+        <span><strong>Articolo</strong></span>
+        @if (formItem(); as item) {
+          <span>Selezionato: <strong>{{ item.code }}</strong> — {{ item.description }}</span>
+        } @else {
+          <span class="muted">Nessun articolo scelto</span>
+        }
+        <app-item-picker
+          label="Cerca l’articolo da movimentare"
+          [selectedId]="formItem()?.id ?? null"
+          (picked)="formItem.set($event)"
+        />
+      </div>
+      <div class="field">
+        <label for="movement-type">Tipo</label>
+        <select id="movement-type" formControlName="type">
+          @for (type of types; track type.value) {
+            <option [value]="type.value">{{ type.label }}</option>
+          }
+        </select>
+      </div>
+      <div class="field">
+        <label for="movement-quantity">Quantità</label>
+        <input id="movement-quantity" type="number" min="0" step="any" formControlName="quantity" />
+        @if (form.controls.quantity.touched && form.controls.quantity.invalid) {
+          <span class="field-error">Inserisci una quantità maggiore di 0</span>
+        }
+      </div>
+      <div class="field">
+        <label for="movement-reason">Motivo</label>
+        <input id="movement-reason" formControlName="reason" maxlength="200" placeholder="Es. inventario, vendita" />
+        @if (form.controls.reason.touched && form.controls.reason.invalid) {
+          <span class="field-error">Obbligatorio (max 200 caratteri)</span>
+        }
+      </div>
+      <div class="field">
+        <label for="movement-document">Documento di riferimento (facoltativo)</label>
+        <input id="movement-document" formControlName="sourceDocument" maxlength="200" />
+      </div>
+    </div>
+    @if (formError(); as message) {
+      <p class="banner banner-error" role="alert"><strong>Movimento non registrato.</strong> {{ message }}</p>
+    }
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary" [disabled]="saving() || !formItem()">Registra</button>
+    </div>
+  </form>
+</section>
+
+<section class="card">
+  <h2>Storico movimenti</h2>
+  <div class="field filter">
+    <span><strong>Filtra per articolo</strong></span>
+    @if (filterItem(); as item) {
+      <span>
+        <strong>{{ item.code }}</strong> — {{ item.description }}
+        <button type="button" class="btn btn-small" (click)="setFilter(null)">Mostra tutti</button>
+      </span>
+    } @else {
+      <span class="muted">Tutti gli articoli</span>
+    }
+    <app-item-picker label="Cerca l’articolo da filtrare" [selectedId]="filterItem()?.id ?? null" (picked)="setFilter($event)" />
+  </div>
+
+  @if (movements.isLoading() && !movements.hasValue()) {
+    <p class="loading">Caricamento movimenti…</p>
+  } @else if (movements.hasValue()) {
+    @if (movements.value().content.length === 0) {
+      <p class="empty">Nessun movimento registrato.</p>
+    } @else {
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Articolo</th>
+              <th>Tipo</th>
+              <th class="num">Quantità</th>
+              <th>Motivo</th>
+              <th>Documento</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (movement of movements.value().content; track movement.id) {
+              <tr>
+                <td>{{ movement.createdAt | itDateTime }}</td>
+                <td>
+                  <strong>{{ movement.itemCode }}</strong>
+                </td>
+                <td><app-movement-type [type]="movement.type" /></td>
+                <td class="num">{{ movement.quantity | quantity }}</td>
+                <td>{{ movement.reason }}</td>
+                <td>{{ movement.sourceDocument ?? '—' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <app-pager
+        [page]="movements.value().page"
+        [totalPages]="movements.value().totalPages"
+        [totalElements]="movements.value().totalElements"
+        (pageChange)="page.set($event)"
+      />
+    }
+  }
+</section>

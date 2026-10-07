@@ -17,5 +17,10 @@ export const routes: Routes = [
     title: 'Articoli',
     loadComponent: () => import('./items/item-list').then((m) => m.ItemList),
   },
+  {
+    path: 'magazzino',
+    title: 'Magazzino',
+    loadComponent: () => import('./inventory/movements').then((m) => m.Movements),
+  },
   { path: '**', redirectTo: '' },
 ];
