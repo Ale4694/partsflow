@@ -32,5 +32,10 @@ export const routes: Routes = [
     title: 'Bozza di importazione',
     loadComponent: () => import('./imports/draft-detail').then((m) => m.DraftDetail),
   },
+  {
+    path: 'assistente',
+    title: 'Assistente',
+    loadComponent: () => import('./ai/assistant').then((m) => m.Assistant),
+  },
   { path: '**', redirectTo: '' },
 ];

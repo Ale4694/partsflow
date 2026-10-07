@@ -1,0 +1,53 @@
+<header class="page-header">
+  <h1>Assistente</h1>
+</header>
+
+@if (ai.loading()) {
+  <p class="loading">Verifica della disponibilità dell’AI…</p>
+} @else if (!ai.available()) {
+  <p class="banner">
+    <strong>Assistente non disponibile.</strong> Il server non ha una chiave LLM_API_KEY, quindi le funzioni AI sono
+    disattivate. Il resto dell’applicazione funziona normalmente.
+  </p>
+}
+
+<section class="card chat">
+  <p class="muted">
+    Fai domande sul magazzino in linguaggio naturale. L’assistente risponde solo in base ai dati che legge dal
+    sistema e non può modificare nulla.
+  </p>
+
+  <div class="messages" aria-live="polite">
+    @for (message of messages(); track $index) {
+      <div class="message" [class.mine]="message.from === 'user'">
+        <span class="who">{{ message.from === 'user' ? 'Tu' : 'Assistente' }}</span>
+        <p>{{ message.text }}</p>
+      </div>
+    } @empty {
+      <p class="empty">Nessun messaggio. Scrivi una domanda o scegli un esempio.</p>
+    }
+    @if (waiting()) {
+      <p class="muted">L’assistente sta consultando il magazzino…</p>
+    }
+  </div>
+
+  <div class="examples">
+    @for (example of examples; track example) {
+      <button type="button" class="btn btn-small" [disabled]="!ai.available()" (click)="use(example)">
+        {{ example }}
+      </button>
+    }
+  </div>
+
+  <form class="send" [formGroup]="form" (ngSubmit)="send()">
+    <label class="sr-only" for="question">La tua domanda</label>
+    <input
+      id="question"
+      formControlName="question"
+      maxlength="500"
+      placeholder="Scrivi una domanda…"
+      autocomplete="off"
+    />
+    <button type="submit" class="btn btn-primary" [disabled]="form.invalid || waiting() || !ai.available()">Invia</button>
+  </form>
+</section>

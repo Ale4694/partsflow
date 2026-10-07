@@ -1,0 +1,54 @@
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 12rem;
+  max-height: 28rem;
+  overflow-y: auto;
+  margin: var(--space-4) 0;
+}
+
+.message {
+  align-self: flex-start;
+  max-width: 85%;
+  background: var(--color-bg);
+  border-radius: var(--radius);
+  padding: var(--space-2) var(--space-4);
+}
+
+.message.mine {
+  align-self: flex-end;
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.message p {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.who {
+  font-size: 0.75rem;
+  font-weight: 700;
+  opacity: 0.75;
+}
+
+.examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.send {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
