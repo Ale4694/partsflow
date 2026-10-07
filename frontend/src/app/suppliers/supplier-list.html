@@ -1,0 +1,53 @@
+<header class="page-header">
+  <h1>Fornitori</h1>
+  <button type="button" class="btn btn-primary" (click)="editing.set({ supplier: null })">Nuovo fornitore</button>
+</header>
+
+@if (editing(); as state) {
+  <app-supplier-form [supplier]="state.supplier" (saved)="onSaved()" (cancelled)="editing.set(null)" />
+}
+
+<section class="card">
+  @if (suppliers.isLoading() && !suppliers.hasValue()) {
+    <p class="loading">Caricamento fornitori…</p>
+  } @else if (suppliers.hasValue()) {
+    @if (suppliers.value().content.length === 0) {
+      <p class="empty">Nessun fornitore. Crea il primo con “Nuovo fornitore”.</p>
+    } @else {
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Ragione sociale</th>
+              <th>Partita IVA</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (supplier of suppliers.value().content; track supplier.id) {
+              <tr>
+                <td>
+                  <strong>{{ supplier.name }}</strong>
+                </td>
+                <td>{{ supplier.vatNumber }}</td>
+                <td class="actions">
+                  <a class="btn btn-small" [routerLink]="['/fornitori', supplier.id]">Codici articolo</a>
+                  <button type="button" class="btn btn-small" (click)="editing.set({ supplier })">Modifica</button>
+                  <button type="button" class="btn btn-small btn-danger" (click)="remove(supplier)">Elimina</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <app-pager
+        [page]="suppliers.value().page"
+        [totalPages]="suppliers.value().totalPages"
+        [totalElements]="suppliers.value().totalElements"
+        (pageChange)="page.set($event)"
+      />
+    }
+  } @else if (suppliers.error()) {
+    <p class="banner banner-error">Impossibile caricare i fornitori.</p>
+  }
+</section>

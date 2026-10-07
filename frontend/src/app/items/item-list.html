@@ -1,0 +1,58 @@
+<header class="page-header">
+  <h1>Articoli</h1>
+  <button type="button" class="btn btn-primary" (click)="openCreate()">Nuovo articolo</button>
+</header>
+
+@if (editing(); as state) {
+  <app-item-form [item]="state.item" (saved)="onSaved()" (cancelled)="editing.set(null)" />
+}
+
+<section class="card">
+  @if (levels.isLoading() && !levels.hasValue()) {
+    <p class="loading">Caricamento articoli…</p>
+  } @else if (levels.hasValue()) {
+    @if (levels.value().content.length === 0) {
+      <p class="empty">Nessun articolo. Crea il primo con “Nuovo articolo”.</p>
+    } @else {
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Codice</th>
+              <th>Descrizione</th>
+              <th>U.M.</th>
+              <th class="num">Giacenza</th>
+              <th class="num">Soglia</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (level of levels.value().content; track level.itemId) {
+              <tr>
+                <td>
+                  <strong>{{ level.itemCode }}</strong>
+                </td>
+                <td>{{ level.description }}</td>
+                <td>{{ level.unit }}</td>
+                <td class="num">{{ level.quantity | quantity }}</td>
+                <td class="num">{{ level.reorderThreshold | quantity }}</td>
+                <td class="actions">
+                  <button type="button" class="btn btn-small" (click)="openEdit(level)">Modifica</button>
+                  <button type="button" class="btn btn-small btn-danger" (click)="remove(level)">Elimina</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <app-pager
+        [page]="levels.value().page"
+        [totalPages]="levels.value().totalPages"
+        [totalElements]="levels.value().totalElements"
+        (pageChange)="page.set($event)"
+      />
+    }
+  } @else if (levels.error()) {
+    <p class="banner banner-error">Impossibile caricare gli articoli.</p>
+  }
+</section>

@@ -1,0 +1,95 @@
+<p><a routerLink="/fornitori">‹ Tutti i fornitori</a></p>
+
+@if (supplier.hasValue()) {
+  <header class="page-header">
+    <div>
+      <h1>{{ supplier.value().name }}</h1>
+      <span class="muted">Partita IVA {{ supplier.value().vatNumber }}</span>
+    </div>
+  </header>
+} @else if (supplier.isLoading()) {
+  <p class="loading">Caricamento fornitore…</p>
+} @else if (supplier.error()) {
+  <p class="banner banner-error">Fornitore non trovato.</p>
+}
+
+<section class="card">
+  <h2>{{ editing() ? 'Modifica codice articolo' : 'Nuovo codice articolo' }}</h2>
+  <p class="muted">
+    Il codice che il fornitore stampa sulle fatture e l’articolo interno corrispondente. Con questo abbinamento le
+    righe delle fatture vengono riconosciute da sole.
+  </p>
+  <form [formGroup]="form" (ngSubmit)="save()">
+    <div class="form-grid">
+      <div class="field">
+        <label for="supplier-code">Codice del fornitore</label>
+        <input id="supplier-code" formControlName="supplierCode" maxlength="100" placeholder="RR-BRK-001" />
+        @if (form.controls.supplierCode.touched && form.controls.supplierCode.invalid) {
+          <span class="field-error">Obbligatorio (max 100 caratteri)</span>
+        }
+      </div>
+      <div class="field">
+        <span class="field-label"><strong>Articolo interno</strong></span>
+        @if (pickedItem(); as item) {
+          <span>Selezionato: <strong>{{ item.code }}</strong> — {{ item.description }}</span>
+        } @else if (editing(); as code) {
+          <span>Attuale: <strong>{{ code.itemCode }}</strong> (scegline un altro per cambiarlo)</span>
+        } @else {
+          <span class="muted">Nessun articolo scelto</span>
+        }
+        <app-item-picker label="Cerca l’articolo interno" [selectedId]="pickedItem()?.id ?? null" (picked)="pick($event)" />
+      </div>
+    </div>
+    <div class="form-actions">
+      @if (editing()) {
+        <button type="button" class="btn" (click)="resetForm()">Annulla</button>
+      }
+      <button type="submit" class="btn btn-primary" [disabled]="saving() || (!pickedItem() && !editing())">
+        {{ editing() ? 'Salva' : 'Aggiungi' }}
+      </button>
+    </div>
+  </form>
+</section>
+
+<section class="card">
+  <h2>Codici articolo</h2>
+  @if (codes.isLoading() && !codes.hasValue()) {
+    <p class="loading">Caricamento codici…</p>
+  } @else if (codes.hasValue()) {
+    @if (codes.value().content.length === 0) {
+      <p class="empty">Questo fornitore non ha ancora codici articolo.</p>
+    } @else {
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Codice fornitore</th>
+              <th>Articolo interno</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (code of codes.value().content; track code.id) {
+              <tr>
+                <td>
+                  <strong>{{ code.supplierCode }}</strong>
+                </td>
+                <td>{{ code.itemCode }}</td>
+                <td class="actions">
+                  <button type="button" class="btn btn-small" (click)="startEdit(code)">Modifica</button>
+                  <button type="button" class="btn btn-small btn-danger" (click)="remove(code)">Elimina</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <app-pager
+        [page]="codes.value().page"
+        [totalPages]="codes.value().totalPages"
+        [totalElements]="codes.value().totalElements"
+        (pageChange)="page.set($event)"
+      />
+    }
+  }
+</section>
