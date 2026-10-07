@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import io.github.ale4694.partsflow.catalog.ItemRepository;
 import io.github.ale4694.partsflow.common.ConflictException;
 import io.github.ale4694.partsflow.common.ResourceNotFoundException;
+import io.github.ale4694.partsflow.common.RetryingTransaction;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
@@ -43,7 +44,7 @@ class InventoryServiceTest {
 	@BeforeEach
 	void setUp() {
 		Clock clock = Clock.fixed(Instant.parse("2026-01-15T10:00:00Z"), ZoneOffset.UTC);
-		service = new InventoryService(stocks, movements, items, transactionManager, clock);
+		service = new InventoryService(stocks, movements, items, new RetryingTransaction(transactionManager), clock);
 	}
 
 	private StockMovementRequest request(MovementType type, String quantity) {
@@ -137,7 +138,7 @@ class InventoryServiceTest {
 		assertThatThrownBy(() -> service.record(request(MovementType.IN, "1")))
 				.isInstanceOf(ConflictException.class)
 				.hasMessageContaining("concurrently");
-		verify(stocks, times(InventoryService.MAX_ATTEMPTS)).save(any(Stock.class));
+		verify(stocks, times(RetryingTransaction.MAX_ATTEMPTS)).save(any(Stock.class));
 	}
 
 	@Test

@@ -2,46 +2,34 @@ package io.github.ale4694.partsflow.inventory;
 
 import io.github.ale4694.partsflow.catalog.Item;
 import io.github.ale4694.partsflow.catalog.ItemRepository;
-import io.github.ale4694.partsflow.common.ConflictException;
 import io.github.ale4694.partsflow.common.PageResponse;
 import io.github.ale4694.partsflow.common.ResourceNotFoundException;
+import io.github.ale4694.partsflow.common.RetryingTransaction;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class InventoryService {
 
-	private static final Logger log = LoggerFactory.getLogger(InventoryService.class);
-
-	/**
-	 * With N concurrent writers on the same item, each round at least one of them wins, so a writer
-	 * loses at most N-1 times. 10 attempts is plenty for a small distributor.
-	 */
-	static final int MAX_ATTEMPTS = 10;
-
 	private final StockRepository stocks;
 	private final StockMovementRepository movements;
 	private final ItemRepository items;
-	private final TransactionTemplate transaction;
+	private final RetryingTransaction retrying;
 	private final Clock clock;
 
 	public InventoryService(StockRepository stocks, StockMovementRepository movements, ItemRepository items,
-			PlatformTransactionManager transactionManager, Clock clock) {
+			RetryingTransaction retrying, Clock clock) {
 		this.stocks = stocks;
 		this.movements = movements;
 		this.items = items;
-		this.transaction = new TransactionTemplate(transactionManager);
+		this.retrying = retrying;
 		this.clock = clock;
 	}
 
@@ -51,22 +39,19 @@ public class InventoryService {
 
 	/**
 	 * Applies all movements in ONE transaction: either every movement is recorded or none is.
-	 * Not annotated with @Transactional on purpose: the retry loop must run outside the transaction,
-	 * because an optimistic lock failure is only detected when the transaction commits.
+	 * Not annotated with @Transactional on purpose: the retry loop must run outside the transaction.
 	 */
 	public List<StockMovementResponse> recordAll(List<StockMovementRequest> requests) {
-		for (int attempt = 1; ; attempt++) {
-			try {
-				return transaction.execute(status -> requests.stream().map(this::apply).toList());
-			}
-			catch (ObjectOptimisticLockingFailureException | DataIntegrityViolationException ex) {
-				// Another transaction changed the same stock row (or created it first): try again on fresh data
-				if (attempt == MAX_ATTEMPTS) {
-					throw new ConflictException("The stock was modified concurrently, please retry");
-				}
-				log.debug("Concurrent stock update, retrying (attempt {})", attempt);
-			}
-		}
+		return retrying.execute(() -> applyAll(requests));
+	}
+
+	/**
+	 * Applies the movements inside the CALLER's transaction, so another feature can commit its own changes
+	 * (e.g. "draft confirmed") atomically with the stock update. The caller owns the retry on conflicts.
+	 */
+	@Transactional(propagation = Propagation.MANDATORY)
+	public List<StockMovementResponse> applyAll(List<StockMovementRequest> requests) {
+		return requests.stream().map(this::apply).toList();
 	}
 
 	private StockMovementResponse apply(StockMovementRequest request) {
@@ -89,29 +74,28 @@ public class InventoryService {
 		return StockMovementResponse.from(movements.save(movement));
 	}
 
+	@Transactional(readOnly = true)
 	public StockResponse getStock(Long itemId) {
-		return transaction.execute(status -> {
-			Item item = items.findById(itemId).orElseThrow(() -> new ResourceNotFoundException("Item", itemId));
-			BigDecimal quantity = stocks.findById(itemId).map(Stock::getQuantity).orElse(BigDecimal.ZERO);
-			return new StockResponse(itemId, item.getCode(), quantity, item.getUnit(), item.getReorderThreshold());
-		});
+		Item item = items.findById(itemId).orElseThrow(() -> new ResourceNotFoundException("Item", itemId));
+		BigDecimal quantity = stocks.findById(itemId).map(Stock::getQuantity).orElse(BigDecimal.ZERO);
+		return new StockResponse(itemId, item.getCode(), quantity, item.getUnit(), item.getReorderThreshold());
 	}
 
+	@Transactional(readOnly = true)
 	public PageResponse<StockMovementResponse> listMovements(Long itemId, Pageable pageable) {
-		return transaction.execute(status -> {
-			if (itemId == null) {
-				return PageResponse.from(movements.findAll(pageable).map(StockMovementResponse::from));
-			}
-			if (!items.existsById(itemId)) {
-				throw new ResourceNotFoundException("Item", itemId);
-			}
-			return PageResponse.from(movements.findByItemId(itemId, pageable).map(StockMovementResponse::from));
-		});
+		if (itemId == null) {
+			return PageResponse.from(movements.findAll(pageable).map(StockMovementResponse::from));
+		}
+		if (!items.existsById(itemId)) {
+			throw new ResourceNotFoundException("Item", itemId);
+		}
+		return PageResponse.from(movements.findByItemId(itemId, pageable).map(StockMovementResponse::from));
 	}
 
+	@Transactional(readOnly = true)
 	public PageResponse<LowStockItem> listLowStock(Pageable pageable) {
 		// Ordering is fixed in the query (by item code); a client-supplied sort is ignored
 		Pageable unsorted = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
-		return transaction.execute(status -> PageResponse.from(stocks.findLowStock(unsorted)));
+		return PageResponse.from(stocks.findLowStock(unsorted));
 	}
 }

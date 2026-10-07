@@ -21,13 +21,13 @@ Milestones are built in order. Each one ends with a passing `./mvnw verify` and 
 - [x] Integration tests with Testcontainers, including a concurrency test
 
 ## M3 — FatturaPA import
-- [ ] Parse FatturaPA XML (FPR12/FPA12, v1.2.x) with Jackson XML; XML mapping classes separate from the domain model
-- [ ] BigDecimal for money and quantities; line totals validated against `DatiRiepilogo`
-- [ ] Document types as a sealed interface; TD04 credit notes reverse quantities
-- [ ] Idempotent import (same supplier + number + date is rejected)
-- [ ] Unknown supplier codes become pending review items, not stock
-- [ ] Upload creates a draft; a confirm endpoint writes the stock movements
-- [ ] Synthetic fixtures: valid invoice, credit note, malformed file, totals mismatch, unknown codes
+- [x] Parse FatturaPA XML (FPR12/FPA12, v1.2.x) with Jackson XML; XML mapping classes separate from the domain model
+- [x] BigDecimal for money and quantities; line totals validated against `DatiRiepilogo`
+- [x] Document types as a sealed interface; TD04 credit notes reverse quantities
+- [x] Idempotent import (same supplier + number + date is rejected)
+- [x] Unknown supplier codes become pending review items, not stock
+- [x] Upload creates a draft; a confirm endpoint writes the stock movements
+- [x] Synthetic fixtures: valid invoice, credit note, malformed file, totals mismatch, unknown codes
 
 ## M4 — AI agent (human in the loop)
 - [ ] PDF documents: PDFBox text extraction, LLM structured output, validation in code, same draft as M3
@@ -43,3 +43,5 @@ Milestones are built in order. Each one ends with a passing `./mvnw verify` and 
 
 ## Later / out of scope for now
 - Signed FatturaPA files (`.p7m`)
+- FatturaPA files containing several documents (several `FatturaElettronicaBody`)
+- Document-level discounts and non-EUR currencies in FatturaPA import
