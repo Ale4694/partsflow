@@ -70,6 +70,8 @@ class FatturaPaParserTest {
 		assertThat(first.vatRate()).isEqualByComparingTo("22");
 		assertThat(first.articleCodes()).containsExactly(
 				new ArticleCode("EAN", "8000000000011"), new ArticleCode("FORNITORE", "RR-BRK-001"));
+		// the EAN is printed first, but the supplier code is the one used for matching
+		assertThat(first.supplierCode()).isEqualTo("RR-BRK-001");
 	}
 
 	@Test

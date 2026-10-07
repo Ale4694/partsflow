@@ -224,6 +224,41 @@ class ImportApiIntegrationTest {
 		assertThat(mappings.findBySupplierIdAndSupplierCode(supplier.getId(), "UNK-777")).isPresent();
 	}
 
+	/** invoice-valid.xml prints two codes on line 1: the EAN first, then the supplier's own code (CodiceTipo FORNITORE). */
+	@Test
+	void pendingLineShowsAndRemembersTheSupplierCodeNotTheBarcode() throws Exception {
+		mappings.delete(mappings.findBySupplierIdAndSupplierCode(supplier.getId(), "RR-BRK-001").orElseThrow());
+		long draftId = uploadOk("invoice-valid.xml");
+
+		mvc.perform(get("/api/imports/" + draftId))
+				.andExpect(jsonPath("$.pendingLines").value(1))
+				.andExpect(jsonPath("$.lines[0].status").value("PENDING_REVIEW"))
+				.andExpect(jsonPath("$.lines[0].supplierCode").value("RR-BRK-001"));
+
+		mvc.perform(post("/api/imports/" + draftId + "/lines/" + lineId(draftId, 0) + "/resolve")
+				.contentType(MediaType.APPLICATION_JSON).content("{\"itemId\": " + brakePads.getId() + "}"))
+				.andExpect(status().isOk());
+		assertThat(mappings.findBySupplierIdAndSupplierCode(supplier.getId(), "RR-BRK-001")).isPresent();
+		assertThat(mappings.findBySupplierIdAndSupplierCode(supplier.getId(), "8000000000011")).isEmpty();
+
+		// the next document with the same codes is matched without any review
+		mvc.perform(delete("/api/imports/" + draftId)).andExpect(status().isNoContent());
+		long again = uploadOk("invoice-valid.xml");
+		mvc.perform(get("/api/imports/" + again)).andExpect(jsonPath("$.pendingLines").value(0));
+	}
+
+	@Test
+	void aLineIsAlsoMatchedThroughItsBarcodeWhenOnlyTheBarcodeIsMapped() throws Exception {
+		mappings.delete(mappings.findBySupplierIdAndSupplierCode(supplier.getId(), "RR-BRK-001").orElseThrow());
+		mappings.save(new SupplierItemCode(supplier, brakePads, "8000000000011"));
+		long draftId = uploadOk("invoice-valid.xml");
+
+		mvc.perform(get("/api/imports/" + draftId))
+				.andExpect(jsonPath("$.pendingLines").value(0))
+				.andExpect(jsonPath("$.lines[0].status").value("MATCHED"))
+				.andExpect(jsonPath("$.lines[0].itemCode").value(brakePads.getCode()));
+	}
+
 	@Test
 	void creditNoteReversesTheQuantities() throws Exception {
 		addStock(brakePads, "5");

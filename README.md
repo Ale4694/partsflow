@@ -125,6 +125,8 @@ curl -s -F file=@src/test/resources/fatturapa/invoice-valid.xml localhost:8080/a
 
 (The ids above assume a fresh database.)
 
+The sample invoice prints two codes on its first line: an EAN barcode and the supplier's own code `RR-BRK-001`. The supplier's code is the one used to identify a line (barcodes are only a fallback), see [ADR 0005](docs/adr/0005-draft-then-confirm-import.md). If you upload the invoice **before** creating the supplier item codes, the lines stay `PENDING_REVIEW`: resolve them (or create the codes and upload again) and the codes are remembered.
+
 ## Develop
 
 Requirements: Java 21 and Docker (the integration tests start PostgreSQL with Testcontainers).

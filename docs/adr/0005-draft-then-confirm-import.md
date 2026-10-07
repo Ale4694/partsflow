@@ -13,6 +13,7 @@ An import is two steps:
 
 Safety rules around it:
 
+- **Which code identifies a line**: FatturaPA allows several `CodiceArticolo` per line, each with a free-text `CodiceTipo` (the sample invoice prints an `EAN` and then the supplier's own `FORNITORE` code). The *supplier code* of a line is the first code whose type is **not** a barcode (`EAN`, `GTIN`, `UPC`, `BARCODE`, compared ignoring case); if the line only has barcodes, the first one is used. That code is what a pending line shows and what is remembered when a person resolves it. Matching against known mappings tries every code, supplier codes before barcodes, so a mapping saved under any of them is found. The rule lives in `DocumentLine.supplierCode()`.
 - **Idempotency**: `UNIQUE (supplier_id, document_number, document_date)`. The same document cannot be imported twice; the second upload is a `409`. A draft that was not confirmed can be deleted to upload a corrected file.
 - **Double confirm**: the draft has a `@Version` and is loaded with `OPTIMISTIC_FORCE_INCREMENT`, so two simultaneous confirms conflict; the loser retries, sees `CONFIRMED`, and answers `409`. Stock is applied once.
 - **Validation before the draft exists**: totals must match `DatiRiepilogo` per VAT rate, the document type must be supported, the supplier must exist in the catalog. Failures are `422` with a message that says what is wrong.

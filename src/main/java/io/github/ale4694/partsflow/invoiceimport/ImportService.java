@@ -111,15 +111,15 @@ public class ImportService {
 
 	private ImportDraftLine toDraftLine(Document document, DocumentLine line,
 			Map<String, SupplierItemCode> knownCodes) {
-		String firstCode = line.articleCodes().isEmpty() ? null : line.articleCodes().getFirst().value();
+		String supplierCode = line.supplierCode();
 		if (line.quantity() == null) {
 			// Not goods (transport, fees...): nothing to put in stock
-			return new ImportDraftLine(line.lineNumber(), firstCode, line.description(), null, line.unit(),
+			return new ImportDraftLine(line.lineNumber(), supplierCode, line.description(), null, line.unit(),
 					line.unitPrice(), line.totalPrice(), line.vatRate(), null, LineStatus.SKIPPED, null);
 		}
 		BigDecimal stockDelta = StockEffects.stockDelta(document, line);
-		// A line can print several codes (EAN, supplier SKU...): the first one we know wins
-		for (ArticleCode code : line.articleCodes()) {
+		// A line can print several codes (EAN, supplier SKU...): the first one we know wins, supplier codes before barcodes
+		for (ArticleCode code : line.codesByPreference()) {
 			SupplierItemCode mapping = knownCodes.get(code.value());
 			if (mapping != null) {
 				return new ImportDraftLine(line.lineNumber(), code.value(), line.description(), line.quantity(),
@@ -127,7 +127,7 @@ public class ImportService {
 						LineStatus.MATCHED, mapping.getItem());
 			}
 		}
-		return new ImportDraftLine(line.lineNumber(), firstCode, line.description(), line.quantity(), line.unit(),
+		return new ImportDraftLine(line.lineNumber(), supplierCode, line.description(), line.quantity(), line.unit(),
 				line.unitPrice(), line.totalPrice(), line.vatRate(), stockDelta, LineStatus.PENDING_REVIEW, null);
 	}
 
