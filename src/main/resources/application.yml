@@ -19,6 +19,11 @@ spring:
       max-retries: 0
       chat:
         model: ${partsflow.ai.model}
+  autoconfigure:
+    exclude:
+      # Spring AI would build its own Gemini connection for embeddings (needing a Vertex project id, with the
+      # SDK's default retries). GeminiConfiguration supplies the connection details from our own client instead.
+      - org.springframework.ai.model.google.genai.autoconfigure.embedding.GoogleGenAiEmbeddingConnectionAutoConfiguration
   application:
     name: partsflow
   datasource:
@@ -32,6 +37,9 @@ spring:
     open-in-view: false
   flyway:
     enabled: true
+    placeholders:
+      # Size of the embedding vectors, used by V6__item_embedding.sql (see ADR 0012)
+      embeddingDimensions: ${partsflow.embeddings.dimensions}
   servlet:
     multipart:
       max-file-size: 5MB
@@ -49,6 +57,10 @@ management:
         include: health
 
 partsflow:
+  embeddings:
+    # Semantic search (embeddings). Same provider and key as the chat model; see README, "Semantic search".
+    model: ${LLM_EMBEDDING_MODEL:}
+    dimensions: ${LLM_EMBEDDING_DIMENSIONS:768}
   ai:
     # LLM settings, only from environment variables (see README, "Choosing the LLM provider")
     provider: ${LLM_PROVIDER:gemini}
@@ -58,9 +70,21 @@ partsflow:
     chat-model:
       gemini: google-genai
       openai-compatible: openai
+    # Embedding model names for each provider: the OpenAI starter reads spring.ai.model.embedding, the Gemini one
+    # spring.ai.model.embedding.text (see the end of this file)
+    embedding-model:
+      openai:
+        openai-compatible: openai
+      gemini:
+        gemini: google-genai
     max-agent-steps: 5
     retry:
       max-attempts: 3
       initial-backoff: 2s
       # A 429 asking for a longer wait (a daily quota asks for hours) fails at once instead of being retried
       max-suggested-delay: 20s
+
+# Which Spring AI embedding model starts (like the chat model above, one of the two). These are dotted keys at the
+# root on purpose: "spring.ai.model.embedding" and "spring.ai.model.embedding.text" cannot both be nested YAML maps.
+spring.ai.model.embedding: ${partsflow.ai.embedding-model.openai.${partsflow.ai.provider}:none}
+spring.ai.model.embedding.text: ${partsflow.ai.embedding-model.gemini.${partsflow.ai.provider}:none}

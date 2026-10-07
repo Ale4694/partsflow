@@ -51,8 +51,9 @@ class LlmGatewayTest {
 	void setUp() {
 		model = mock(ChatModel.class);
 		when(model.getOptions()).thenReturn(ChatOptions.builder().build());
-		gateway = new LlmGateway(ChatClient.builder(model).build(), PROPERTIES, new GeminiErrorTranslator());
-		gatewayLogger = (Logger) LoggerFactory.getLogger(LlmGateway.class);
+		gateway = new LlmGateway(ChatClient.builder(model).build(), PROPERTIES,
+				new ProviderCallPolicy(PROPERTIES, new GeminiErrorTranslator()));
+		gatewayLogger = (Logger) LoggerFactory.getLogger(ProviderCallPolicy.class);
 		logs = new ListAppender<>();
 		logs.start();
 		gatewayLogger.addAppender(logs);
@@ -82,7 +83,8 @@ class LlmGatewayTest {
 	@Test
 	void withoutApiKeyTheModelIsNeverCalled() {
 		AiProperties noKey = new AiProperties(5, 5, 0.1, 10, 30000, RETRY, AiProperties.Provider.GEMINI, "", "", "");
-		LlmGateway disabled = new LlmGateway(ChatClient.builder(model).build(), noKey, new GeminiErrorTranslator());
+		LlmGateway disabled = new LlmGateway(ChatClient.builder(model).build(), noKey,
+				new ProviderCallPolicy(noKey, new GeminiErrorTranslator()));
 
 		assertThat(disabled.isConfigured()).isFalse();
 		assertThatThrownBy(() -> disabled.structured("test-op", "s", "u", Answer.class))

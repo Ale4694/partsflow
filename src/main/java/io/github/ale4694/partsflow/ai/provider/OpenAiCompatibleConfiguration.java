@@ -15,6 +15,11 @@ import org.springframework.context.annotation.Configuration;
 class OpenAiCompatibleConfiguration {
 
 	@Bean
+	EmbeddingOptionsFactory openAiEmbeddingOptionsFactory() {
+		return new OpenAiEmbeddingOptionsFactory();
+	}
+
+	@Bean
 	LlmErrorTranslator openAiErrorTranslator() {
 		return new OpenAiErrorTranslator();
 	}

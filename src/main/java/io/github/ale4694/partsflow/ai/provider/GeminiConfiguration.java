@@ -3,6 +3,7 @@ package io.github.ale4694.partsflow.ai.provider;
 import com.google.genai.Client;
 import com.google.genai.types.HttpOptions;
 import com.google.genai.types.HttpRetryOptions;
+import org.springframework.ai.google.genai.embedding.GoogleGenAiEmbeddingConnectionDetails;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,6 +43,20 @@ public class GeminiConfiguration {
 	 */
 	public static HttpOptions httpOptions() {
 		return HttpOptions.builder().retryOptions(HttpRetryOptions.builder().attempts(1).build()).build();
+	}
+
+	/**
+	 * Gemini embeddings use the same client as the chat model (one API key, one-attempt retry policy), wrapped in
+	 * the connection details that Spring AI's embedding model asks for.
+	 */
+	@Bean
+	GoogleGenAiEmbeddingConnectionDetails googleGenAiEmbeddingConnectionDetails(Client client) {
+		return GoogleGenAiEmbeddingConnectionDetails.builder().genAiClient(client).build();
+	}
+
+	@Bean
+	EmbeddingOptionsFactory geminiEmbeddingOptionsFactory() {
+		return new GeminiEmbeddingOptionsFactory();
 	}
 
 	@Bean
