@@ -42,6 +42,10 @@ public class ImportDraft {
 	@JoinColumn(name = "supplier_id")
 	private Supplier supplier;
 
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private DraftSource source;
+
 	@Column(name = "tipo_documento", nullable = false)
 	private String tipoDocumento;
 
@@ -79,9 +83,10 @@ public class ImportDraft {
 		// required by JPA
 	}
 
-	public ImportDraft(Supplier supplier, String tipoDocumento, String documentNumber, LocalDate documentDate,
+	public ImportDraft(Supplier supplier, DraftSource source, String tipoDocumento, String documentNumber, LocalDate documentDate,
 			BigDecimal totalAmount, Instant createdAt) {
 		this.supplier = supplier;
+		this.source = source;
 		this.tipoDocumento = tipoDocumento;
 		this.documentNumber = documentNumber;
 		this.documentDate = documentDate;
@@ -133,6 +138,10 @@ public class ImportDraft {
 
 	public Supplier getSupplier() {
 		return supplier;
+	}
+
+	public DraftSource getSource() {
+		return source;
 	}
 
 	public String getTipoDocumento() {

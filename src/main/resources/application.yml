@@ -1,4 +1,12 @@
 spring:
+  ai:
+    google:
+      genai:
+        # The key is read ONLY from the environment. Empty = AI endpoints answer 503, the rest of the app works.
+        api-key: ${LLM_API_KEY:}
+        chat:
+          # Flash-class model that is free of charge on the Gemini Developer API (check the pricing page for changes)
+          model: ${LLM_MODEL:gemini-3.5-flash}
   application:
     name: partsflow
   datasource:
@@ -20,3 +28,10 @@ spring:
     web:
       pageable:
         max-page-size: 100
+
+partsflow:
+  ai:
+    max-agent-steps: 5
+    retry:
+      max-attempts: 3
+      initial-backoff: 2s

@@ -9,11 +9,12 @@ public final class StockEffects {
 
 	/**
 	 * How much a line changes the stock: positive adds, negative removes.
-	 * Invoices add what they list; credit notes reverse it.
+	 * Invoices and delivery notes add what they list; credit notes reverse it.
 	 */
 	public static BigDecimal stockDelta(Document document, DocumentLine line) {
 		return switch (document) {
 			case Invoice invoice -> line.quantity();
+			case DeliveryNote deliveryNote -> line.quantity();
 			case CreditNote creditNote -> line.quantity().negate();
 		};
 	}

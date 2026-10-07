@@ -20,6 +20,7 @@ import io.github.ale4694.partsflow.invoiceimport.domain.DocumentLine;
 import io.github.ale4694.partsflow.invoiceimport.domain.InvalidDocumentException;
 import io.github.ale4694.partsflow.invoiceimport.domain.StockEffects;
 import io.github.ale4694.partsflow.invoiceimport.draft.DraftDdtReference;
+import io.github.ale4694.partsflow.invoiceimport.draft.DraftSource;
 import io.github.ale4694.partsflow.invoiceimport.draft.DraftStatus;
 import io.github.ale4694.partsflow.invoiceimport.draft.ImportDraft;
 import io.github.ale4694.partsflow.invoiceimport.draft.ImportDraftLine;
@@ -70,12 +71,12 @@ public class ImportService {
 
 	@Transactional
 	public DraftResponse importFatturaPa(InputStream xml) {
-		return createDraft(parser.parse(xml));
+		return createDraft(parser.parse(xml), DraftSource.XML);
 	}
 
 	/** Builds a draft from an already validated document. Every import path (XML, PDF) ends up here. */
 	@Transactional
-	public DraftResponse createDraft(Document document) {
+	public DraftResponse createDraft(Document document, DraftSource source) {
 		DocumentBody body = document.body();
 		Supplier supplier = suppliers.findByVatNumber(body.supplier().vatNumber())
 				.orElseThrow(() -> new InvalidDocumentException("Unknown supplier with VAT number "
@@ -86,7 +87,7 @@ public class ImportService {
 					+ supplier.getName() + " was already imported");
 		}
 
-		ImportDraft draft = new ImportDraft(supplier, body.tipoDocumento(), body.number(), body.date(), body.total(),
+		ImportDraft draft = new ImportDraft(supplier, source, body.tipoDocumento(), body.number(), body.date(), body.total(),
 				clock.instant());
 		body.ddtReferences().forEach(ddt -> draft.addDdtReference(new DraftDdtReference(ddt.number(), ddt.date())));
 

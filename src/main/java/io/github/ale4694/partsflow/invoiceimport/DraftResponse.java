@@ -1,5 +1,6 @@
 package io.github.ale4694.partsflow.invoiceimport;
 
+import io.github.ale4694.partsflow.invoiceimport.draft.DraftSource;
 import io.github.ale4694.partsflow.invoiceimport.draft.DraftStatus;
 import io.github.ale4694.partsflow.invoiceimport.draft.ImportDraft;
 import java.math.BigDecimal;
@@ -11,6 +12,7 @@ import java.util.List;
 public record DraftResponse(
 		Long id,
 		DraftStatus status,
+		DraftSource source,
 		Long supplierId,
 		String supplierName,
 		String tipoDocumento,
@@ -27,7 +29,7 @@ public record DraftResponse(
 	}
 
 	static DraftResponse from(ImportDraft draft) {
-		return new DraftResponse(draft.getId(), draft.getStatus(), draft.getSupplier().getId(),
+		return new DraftResponse(draft.getId(), draft.getStatus(), draft.getSource(), draft.getSupplier().getId(),
 				draft.getSupplier().getName(), draft.getTipoDocumento(), draft.getDocumentNumber(),
 				draft.getDocumentDate(), draft.getTotalAmount(), draft.getCreatedAt(), draft.getConfirmedAt(),
 				draft.getDdtReferences().stream().map(d -> new DdtReferenceResponse(d.getNumber(), d.getDate())).toList(),

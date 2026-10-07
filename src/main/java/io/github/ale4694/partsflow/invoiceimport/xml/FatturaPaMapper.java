@@ -10,6 +10,7 @@ import io.github.ale4694.partsflow.invoiceimport.domain.DocumentTotalsValidator;
 import io.github.ale4694.partsflow.invoiceimport.domain.InvalidDocumentException;
 import io.github.ale4694.partsflow.invoiceimport.domain.Invoice;
 import io.github.ale4694.partsflow.invoiceimport.domain.MalformedDocumentException;
+import io.github.ale4694.partsflow.invoiceimport.domain.Quantities;
 import io.github.ale4694.partsflow.invoiceimport.domain.SupplierParty;
 import io.github.ale4694.partsflow.invoiceimport.domain.VatSummary;
 import java.math.BigDecimal;
@@ -26,9 +27,6 @@ import java.util.Locale;
  * </ul>
  */
 public class FatturaPaMapper {
-
-	/** Quantities are stored with 3 decimals. */
-	private static final int MAX_QUANTITY_DECIMALS = 3;
 
 	public Document toDocument(FatturaPaXml xml) {
 		FatturaPaXml.CedentePrestatore cedente = require(xml.header() == null ? null : xml.header().cedentePrestatore(),
@@ -97,7 +95,7 @@ public class FatturaPaMapper {
 	private DocumentLine toLine(FatturaPaXml.DettaglioLinee line) {
 		BigDecimal quantity = null;
 		if (line.quantita() != null && !line.quantita().isBlank()) {
-			quantity = quantity(decimal(line.quantita(), "Quantita"));
+			quantity = Quantities.normalize(decimal(line.quantita(), "Quantita"));
 		}
 		BigDecimal unitPrice = line.prezzoUnitario() == null || line.prezzoUnitario().isBlank() ? null
 				: decimal(line.prezzoUnitario(), "PrezzoUnitario");
@@ -126,16 +124,6 @@ public class FatturaPaMapper {
 	private DdtReference toDdt(FatturaPaXml.DatiDdt ddt) {
 		LocalDate date = ddt.dataDdt() == null || ddt.dataDdt().isBlank() ? null : date(ddt.dataDdt(), "DataDDT");
 		return new DdtReference(requireText(ddt.numeroDdt(), "NumeroDDT"), date);
-	}
-
-	/** Quantities keep at most 3 decimals: "2.00000000" is fine, "2.0005" is rejected rather than silently rounded. */
-	private BigDecimal quantity(BigDecimal value) {
-		BigDecimal stripped = value.stripTrailingZeros();
-		if (stripped.scale() > MAX_QUANTITY_DECIMALS) {
-			throw new InvalidDocumentException(
-					"Quantity " + value.toPlainString() + " has more than " + MAX_QUANTITY_DECIMALS + " decimals");
-		}
-		return stripped.scale() < 0 ? stripped.setScale(0) : stripped;
 	}
 
 	// ---- small parsing helpers: always from text, never from double ----
