@@ -15,10 +15,10 @@ Milestones are built in order. Each one ends with a passing `./mvnw verify` and 
 - [x] Unit tests and `@WebMvcTest` tests
 
 ## M2 — Inventory
-- [ ] Stock movements (IN/OUT, quantity, reason, source document reference, timestamp) and current stock per item
-- [ ] Optimistic locking on stock; OUT movements that would make stock negative return 409
-- [ ] Endpoint listing items below the reorder threshold
-- [ ] Integration tests with Testcontainers, including a concurrency test
+- [x] Stock movements (IN/OUT, quantity, reason, source document reference, timestamp) and current stock per item
+- [x] Optimistic locking on stock; OUT movements that would make stock negative return 409
+- [x] Endpoint listing items below the reorder threshold
+- [x] Integration tests with Testcontainers, including a concurrency test
 
 ## M3 — FatturaPA import
 - [ ] Parse FatturaPA XML (FPR12/FPA12, v1.2.x) with Jackson XML; XML mapping classes separate from the domain model

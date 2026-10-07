@@ -3,6 +3,7 @@ package io.github.ale4694.partsflow.common;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -27,6 +28,12 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(ConflictException.class)
 	ProblemDetail handleConflict(ConflictException ex) {
 		return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+	}
+
+	/** e.g. ?sort=doesNotExist */
+	@ExceptionHandler(PropertyReferenceException.class)
+	ProblemDetail handleUnknownSortProperty(PropertyReferenceException ex) {
+		return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Unknown sort property: " + ex.getPropertyName());
 	}
 
 	/** Safety net for unique/foreign key violations that slip past the explicit checks (e.g. concurrent requests). */

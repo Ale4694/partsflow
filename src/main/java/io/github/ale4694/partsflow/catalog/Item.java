@@ -25,7 +25,7 @@ public class Item {
 	@Column(nullable = false)
 	private String unit;
 
-	/** Stock at or below this quantity means the item should be reordered. */
+	/** Stock strictly below this quantity means the item should be reordered. */
 	@Column(name = "reorder_threshold", nullable = false)
 	private BigDecimal reorderThreshold;
 
