@@ -1,0 +1,9 @@
+.stat {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.stats {
+  margin-bottom: var(--space-5);
+}

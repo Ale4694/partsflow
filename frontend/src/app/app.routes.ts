@@ -3,6 +3,12 @@ import { Routes } from '@angular/router';
 // Every screen is loaded on demand (lazy), so the first page load stays small.
 export const routes: Routes = [
   {
+    path: '',
+    pathMatch: 'full',
+    title: 'Dashboard',
+    loadComponent: () => import('./dashboard/dashboard').then((m) => m.Dashboard),
+  },
+  {
     path: 'fornitori',
     title: 'Fornitori',
     loadComponent: () => import('./suppliers/supplier-list').then((m) => m.SupplierList),

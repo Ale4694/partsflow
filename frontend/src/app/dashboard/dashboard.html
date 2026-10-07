@@ -1,0 +1,105 @@
+<header class="page-header">
+  <h1>Dashboard</h1>
+</header>
+
+<div class="grid-2 stats">
+  <section class="card">
+    <h2>Bozze da confermare</h2>
+    @if (openDrafts.hasValue()) {
+      <p class="stat">{{ openDrafts.value().totalElements }}</p>
+      <a routerLink="/importazioni">Vai alle importazioni</a>
+    } @else {
+      <p class="loading">Caricamento…</p>
+    }
+  </section>
+
+  <section class="card">
+    <h2>Intelligenza artificiale</h2>
+    @if (ai.loading()) {
+      <p class="muted">Verifica in corso…</p>
+    } @else if (ai.available()) {
+      <p><span class="badge badge-success">Disponibile</span></p>
+      <p class="muted">Importazione PDF, suggerimenti di abbinamento e assistente sono attivi.</p>
+    } @else {
+      <p><span class="badge">Non disponibile</span></p>
+      <p class="muted">
+        Manca la chiave LLM_API_KEY sul server: le funzioni AI sono disattivate, il resto dell’applicazione funziona
+        normalmente.
+      </p>
+    }
+  </section>
+</div>
+
+<div class="grid-2 lists">
+  <section class="card">
+    <h2>Articoli sotto scorta</h2>
+    @if (lowStock.isLoading() && !lowStock.hasValue()) {
+      <p class="loading">Caricamento…</p>
+    } @else if (lowStock.hasValue()) {
+      @if (lowStock.value().content.length === 0) {
+        <p class="empty">Nessun articolo sotto la soglia di riordino.</p>
+      } @else {
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Articolo</th>
+                <th class="num">Giacenza</th>
+                <th class="num">Soglia</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of lowStock.value().content; track item.itemId) {
+                <tr>
+                  <td>
+                    <strong>{{ item.itemCode }}</strong>
+                    <div class="muted">{{ item.description }}</div>
+                  </td>
+                  <td class="num">{{ item.quantity | quantity }} {{ item.unit }}</td>
+                  <td class="num">{{ item.reorderThreshold | quantity }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+  </section>
+
+  <section class="card">
+    <h2>Ultimi movimenti</h2>
+    @if (latestMovements.isLoading() && !latestMovements.hasValue()) {
+      <p class="loading">Caricamento…</p>
+    } @else if (latestMovements.hasValue()) {
+      @if (latestMovements.value().content.length === 0) {
+        <p class="empty">Nessun movimento ancora.</p>
+      } @else {
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Articolo</th>
+                <th>Tipo</th>
+                <th class="num">Quantità</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (movement of latestMovements.value().content; track movement.id) {
+                <tr>
+                  <td>{{ movement.createdAt | itDateTime }}</td>
+                  <td>
+                    <strong>{{ movement.itemCode }}</strong>
+                  </td>
+                  <td><app-movement-type [type]="movement.type" /></td>
+                  <td class="num">{{ movement.quantity | quantity }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <p><a routerLink="/magazzino">Tutto lo storico</a></p>
+      }
+    }
+  </section>
+</div>
