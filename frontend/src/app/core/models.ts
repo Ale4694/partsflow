@@ -42,6 +42,9 @@ export interface Item {
   reorderThreshold: number;
 }
 
+/** What the item picker hands over when a person chooses an item (a search hit has no full Item). */
+export type PickedItem = Pick<Item, 'id' | 'code' | 'description' | 'unit'>;
+
 export interface ItemRequest {
   code: string;
   description: string;
@@ -178,4 +181,31 @@ export interface MatchRun {
 export interface AssistantAnswer {
   answer: string;
   toolCalls: number;
+}
+
+// ---- item search (GET /api/items/search) ----
+
+/** HYBRID = meaning and spelling together ("ricerca intelligente"); TEXT = spelling only ("ricerca testuale"). */
+export type SearchMode = 'HYBRID' | 'TEXT';
+
+/** Why a smart search ran as a text search (null when it did not fall back). */
+export type SearchFallbackReason = 'NOT_CONFIGURED' | 'DIMENSION_MISMATCH' | 'NOT_INDEXED' | 'PROVIDER_ERROR';
+
+export interface ItemHit {
+  itemId: number;
+  code: string;
+  description: string;
+  unit: string;
+  reorderThreshold: number;
+  quantity: number;
+  /** 0 to 1, how well the item matches the search. */
+  score: number;
+  vectorScore: number | null;
+  textScore: number | null;
+}
+
+export interface ItemSearchResult {
+  mode: SearchMode;
+  fallbackReason: SearchFallbackReason | null;
+  results: ItemHit[];
 }

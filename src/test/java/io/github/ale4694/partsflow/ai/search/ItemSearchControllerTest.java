@@ -53,6 +53,7 @@ class ItemSearchControllerTest {
 				.andExpect(jsonPath("$.results[?(@.code == 'CTL-1')].description").value("Cartuccia lubrificante motore 1.2 FIRE"))
 				.andExpect(jsonPath("$.results[0].score").isNumber())
 				.andExpect(jsonPath("$.results[0].quantity").isNumber())
+				.andExpect(jsonPath("$.results[0].reorderThreshold").isNumber())
 				.andExpect(jsonPath("$.results[?(@.code == 'CTL-1')].vectorScore").isNotEmpty());
 	}
 

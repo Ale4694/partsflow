@@ -4,7 +4,7 @@ import { AiApi } from '../ai/ai-api';
 import { AiStatusService } from '../core/ai-status';
 import { ConfirmService } from '../core/confirm';
 import { ItDatePipe, ItDateTimePipe, MoneyPipe, PercentPipe, QuantityPipe } from '../core/format';
-import { DraftLine, Item, Suggestion } from '../core/models';
+import { DraftLine, PickedItem, Suggestion } from '../core/models';
 import { NotificationService } from '../core/notification';
 import { ItemPicker } from '../items/item-picker';
 import { ImportsApi } from './imports-api';
@@ -78,7 +78,7 @@ export class DraftDetail {
     this.resolvingLineId.update((current) => (current === line.id ? null : line.id));
   }
 
-  protected resolve(line: DraftLine, item: Item): void {
+  protected resolve(line: DraftLine, item: PickedItem): void {
     this.run(this.api.resolveLine(this.draftId(), line.id, item.id), 'Riga abbinata');
   }
 

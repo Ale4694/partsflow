@@ -50,8 +50,8 @@ public class ItemSearchService {
 	 * @param vectorScore cosine similarity, null if the item was not among the nearest vectors (or in TEXT mode)
 	 * @param textScore pg_trgm similarity, null if the item was not among the textual matches
 	 */
-	public record Hit(long itemId, String code, String description, String unit, BigDecimal quantity, double score,
-			Double vectorScore, Double textScore) {
+	public record Hit(long itemId, String code, String description, String unit, BigDecimal reorderThreshold,
+			BigDecimal quantity, double score, Double vectorScore, Double textScore) {
 	}
 
 	/** @param fallbackReason null unless a hybrid search had to run as TEXT */
@@ -154,8 +154,8 @@ public class ItemSearchService {
 			return new SearchResult(Mode.TEXT, reason, List.of());
 		}
 		List<Hit> hits = search.textOnly(query.trim(), properties.search().minTextSimilarity(), limit).stream()
-				.map(row -> new Hit(row.itemId(), row.code(), row.description(), row.unit(), row.quantity(),
-						row.fusedScore(), null, row.textSimilarity()))
+				.map(row -> new Hit(row.itemId(), row.code(), row.description(), row.unit(), row.reorderThreshold(),
+						row.quantity(), row.fusedScore(), null, row.textSimilarity()))
 				.toList();
 		return new SearchResult(Mode.TEXT, reason, hits);
 	}
@@ -167,8 +167,8 @@ public class ItemSearchService {
 		List<Hit> hits = search.hybrid(query.trim(), vector, gateway.modelName(), gateway.dimensions(),
 				settings.poolSize(), settings.rrfK(), settings.minTextSimilarity(), settings.minVectorSimilarity(), limit)
 				.stream()
-				.map(row -> new Hit(row.itemId(), row.code(), row.description(), row.unit(), row.quantity(),
-						Math.min(1.0, row.fusedScore() / best), row.vectorSimilarity(), row.textSimilarity()))
+				.map(row -> new Hit(row.itemId(), row.code(), row.description(), row.unit(), row.reorderThreshold(),
+						row.quantity(), Math.min(1.0, row.fusedScore() / best), row.vectorSimilarity(), row.textSimilarity()))
 				.toList();
 		return new SearchResult(Mode.HYBRID, null, hits);
 	}

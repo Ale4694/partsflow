@@ -7,6 +7,7 @@ const EMPTY = '—';
 const quantityFormat = new Intl.NumberFormat('it-IT', { maximumFractionDigits: 3 });
 const moneyFormat = new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' });
 const percentFormat = new Intl.NumberFormat('it-IT', { maximumFractionDigits: 2 });
+const scoreFormat = new Intl.NumberFormat('it-IT', { style: 'percent', maximumFractionDigits: 0 });
 const dateOptions: Intl.DateTimeFormatOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
 // A date without time ("2026-03-10") is read as UTC midnight, so it is also shown in UTC: no off-by-one day
 const dateFormat = new Intl.DateTimeFormat('it-IT', { ...dateOptions, timeZone: 'UTC' });
@@ -22,6 +23,11 @@ export function formatMoney(value: number | null | undefined): string {
 
 export function formatPercent(value: number | null | undefined): string {
   return value == null ? EMPTY : percentFormat.format(value) + '%';
+}
+
+/** How well a search result matches (the backend's 0 to 1 score), shown as a percentage. */
+export function formatScore(value: number | null | undefined): string {
+  return value == null ? EMPTY : scoreFormat.format(value);
 }
 
 /** A date without time, as sent by the backend ("2026-03-10"). */
@@ -66,6 +72,13 @@ export class MoneyPipe implements PipeTransform {
 export class PercentPipe implements PipeTransform {
   transform(value: number | null | undefined): string {
     return formatPercent(value);
+  }
+}
+
+@Pipe({ name: 'score' })
+export class ScorePipe implements PipeTransform {
+  transform(value: number | null | undefined): string {
+    return formatScore(value);
   }
 }
 

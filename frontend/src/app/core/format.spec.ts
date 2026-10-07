@@ -1,4 +1,12 @@
-import { formatDate, formatDateTime, formatMoney, formatPercent, formatQuantity, formatWait } from './format';
+import {
+  formatDate,
+  formatDateTime,
+  formatMoney,
+  formatPercent,
+  formatQuantity,
+  formatScore,
+  formatWait,
+} from './format';
 
 /** Intl uses non-breaking spaces; compare with normal ones so the expectations stay readable. */
 const plain = (text: string) => text.replace(/\s/g, ' ');
@@ -84,6 +92,18 @@ describe('format helpers (it-IT)', () => {
       expect(formatWait(32580)).toBe('circa 9 ore');
       expect(formatWait(3600)).toBe('circa 60 minuti');
       expect(formatWait(2 * 3600)).toBe('circa 2 ore');
+    });
+  });
+
+  describe('formatScore', () => {
+    it('shows the 0 to 1 score of a search result as a percentage', () => {
+      expect(plain(formatScore(0.923))).toBe('92%');
+      expect(plain(formatScore(1))).toBe('100%');
+      expect(plain(formatScore(0.004))).toBe('0%');
+    });
+
+    it('shows a dash for a missing score', () => {
+      expect(formatScore(null)).toBe('—');
     });
   });
 });

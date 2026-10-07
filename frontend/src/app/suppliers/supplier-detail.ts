@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, signal } f
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ConfirmService } from '../core/confirm';
-import { Item, SupplierItemCode } from '../core/models';
+import { PickedItem, SupplierItemCode } from '../core/models';
 import { NotificationService } from '../core/notification';
 import { Pager } from '../core/pager';
 import { ItemPicker } from '../items/item-picker';
@@ -30,14 +30,14 @@ export class SupplierDetail {
 
   /** The mapping being edited; null when adding a new one. */
   protected readonly editing = signal<SupplierItemCode | null>(null);
-  protected readonly pickedItem = signal<Item | null>(null);
+  protected readonly pickedItem = signal<PickedItem | null>(null);
   protected readonly saving = signal(false);
 
   protected readonly form = inject(FormBuilder).nonNullable.group({
     supplierCode: ['', [Validators.required, Validators.maxLength(100)]],
   });
 
-  protected pick(item: Item): void {
+  protected pick(item: PickedItem): void {
     this.pickedItem.set(item);
   }
 

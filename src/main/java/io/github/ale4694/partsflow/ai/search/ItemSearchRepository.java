@@ -25,8 +25,8 @@ import org.springframework.stereotype.Repository;
 class ItemSearchRepository {
 
 	/** One result row. The two similarities are null when the item was not in that ranking. */
-	record Row(long itemId, String code, String description, String unit, BigDecimal quantity, Double vectorSimilarity,
-			Double textSimilarity, double fusedScore) {
+	record Row(long itemId, String code, String description, String unit, BigDecimal reorderThreshold,
+			BigDecimal quantity, Double vectorSimilarity, Double textSimilarity, double fusedScore) {
 	}
 
 	private static final String TEXT_SIMILARITY = "greatest(similarity(i.description, :text), similarity(i.code, :text))";
@@ -40,7 +40,7 @@ class ItemSearchRepository {
 	/** Text ranking only: ordered by pg_trgm similarity; the fused score is that similarity. */
 	List<Row> textOnly(String text, double minSimilarity, int limit) {
 		return jdbc.sql("""
-				SELECT i.id, i.code, i.description, i.unit, coalesce(st.quantity, 0) AS quantity,
+				SELECT i.id, i.code, i.description, i.unit, i.reorder_threshold, coalesce(st.quantity, 0) AS quantity,
 				       CAST(NULL AS float8) AS vector_similarity,
 				       %1$s AS text_similarity,
 				       %1$s AS fused
@@ -76,7 +76,7 @@ class ItemSearchRepository {
 				    ORDER BY similarity DESC, i.code
 				    LIMIT :pool
 				)
-				SELECT i.id, i.code, i.description, i.unit, coalesce(st.quantity, 0) AS quantity,
+				SELECT i.id, i.code, i.description, i.unit, i.reorder_threshold, coalesce(st.quantity, 0) AS quantity,
 				       s.similarity AS vector_similarity,
 				       l.similarity AS text_similarity,
 				       coalesce(1.0 / (:k + s.rank), 0) + coalesce(1.0 / (:k + l.rank), 0) AS fused
@@ -95,7 +95,7 @@ class ItemSearchRepository {
 
 	private static Row toRow(java.sql.ResultSet rs) throws java.sql.SQLException {
 		return new Row(rs.getLong("id"), rs.getString("code"), rs.getString("description"), rs.getString("unit"),
-				rs.getBigDecimal("quantity"), number(rs, "vector_similarity"), number(rs, "text_similarity"),
+				rs.getBigDecimal("reorder_threshold"), rs.getBigDecimal("quantity"), number(rs, "vector_similarity"), number(rs, "text_similarity"),
 				rs.getDouble("fused"));
 	}
 

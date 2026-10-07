@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ItDateTimePipe, QuantityPipe } from '../core/format';
-import { Item, MovementType } from '../core/models';
+import { MovementType, PickedItem } from '../core/models';
 import { MovementTypeBadge } from '../core/movement-type-badge';
 import { NotificationService } from '../core/notification';
 import { Pager } from '../core/pager';
@@ -21,12 +21,12 @@ export class Movements {
   private readonly notifications = inject(NotificationService);
 
   // ---- history ----
-  protected readonly filterItem = signal<Item | null>(null);
+  protected readonly filterItem = signal<PickedItem | null>(null);
   protected readonly page = signal(0);
   protected readonly movements = this.api.movements(() => this.filterItem()?.id ?? null, this.page);
 
   // ---- new movement ----
-  protected readonly formItem = signal<Item | null>(null);
+  protected readonly formItem = signal<PickedItem | null>(null);
   protected readonly saving = signal(false);
   /** Shown inside the form, e.g. "Insufficient stock for item 3: available 1, requested 5" (HTTP 409). */
   protected readonly formError = signal<string | null>(null);
@@ -44,7 +44,7 @@ export class Movements {
     sourceDocument: this.fb.nonNullable.control('', [Validators.maxLength(200)]),
   });
 
-  protected setFilter(item: Item | null): void {
+  protected setFilter(item: PickedItem | null): void {
     this.filterItem.set(item);
     this.page.set(0);
   }

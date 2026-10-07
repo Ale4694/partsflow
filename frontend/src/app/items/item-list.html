@@ -7,6 +7,67 @@
   <app-item-form [item]="state.item" (saved)="onSaved()" (cancelled)="editing.set(null)" />
 }
 
+<section class="card search">
+  <div class="field">
+    <label for="item-search">Cerca un articolo</label>
+    <input
+      #box
+      id="item-search"
+      type="search"
+      placeholder="Per codice, descrizione o significato, ad es. «filtro olio Fiat Panda»"
+      (input)="onSearchInput(box.value)"
+    />
+  </div>
+</section>
+
+@if (searching()) {
+  <section class="card">
+    @if (search.isLoading() && !search.hasValue()) {
+      <p class="loading">Ricerca in corso…</p>
+    } @else if (search.hasValue()) {
+      <p>
+        <app-search-mode [mode]="search.value().mode" [fallbackReason]="search.value().fallbackReason" />
+      </p>
+      @if (search.value().results.length === 0) {
+        <p class="empty">Nessun articolo corrisponde alla ricerca.</p>
+      } @else {
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Codice</th>
+                <th>Descrizione</th>
+                <th>U.M.</th>
+                <th class="num">Giacenza</th>
+                <th class="num">Pertinenza</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (hit of search.value().results; track hit.itemId) {
+                <tr>
+                  <td>
+                    <strong>{{ hit.code }}</strong>
+                  </td>
+                  <td>{{ hit.description }}</td>
+                  <td>{{ hit.unit }}</td>
+                  <td class="num">{{ hit.quantity | quantity }}</td>
+                  <td class="num">{{ hit.score | score }}</td>
+                  <td class="actions">
+                    <button type="button" class="btn btn-small" (click)="openEditHit(hit)">Modifica</button>
+                    <button type="button" class="btn btn-small btn-danger" (click)="removeHit(hit)">Elimina</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    } @else if (search.error()) {
+      <p class="banner banner-error">Impossibile eseguire la ricerca.</p>
+    }
+  </section>
+} @else {
 <section class="card">
   @if (levels.isLoading() && !levels.hasValue()) {
     <p class="loading">Caricamento articoli…</p>
@@ -56,3 +117,4 @@
     <p class="banner banner-error">Impossibile caricare gli articoli.</p>
   }
 </section>
+}
