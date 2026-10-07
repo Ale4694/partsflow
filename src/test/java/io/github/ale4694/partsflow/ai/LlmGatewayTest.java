@@ -36,7 +36,7 @@ class LlmGatewayTest {
 	}
 
 	private static final AiProperties PROPERTIES = new AiProperties(5, 5, 0.1, 10, 30000,
-			new AiProperties.Retry(3, Duration.ofMillis(1), 2.0));
+			new AiProperties.Retry(3, Duration.ofMillis(1), 2.0, Duration.ofSeconds(5)));
 
 	private ChatModel model;
 	private LlmGateway gateway;
@@ -181,5 +181,87 @@ class LlmGatewayTest {
 
 		assertThat(logs.list.stream().filter(e -> e.getLevel() == Level.WARN).map(ILoggingEvent::getFormattedMessage))
 				.singleElement().asString().contains("httpStatus=429").contains("Quota exceeded for metric");
+	}
+
+	private static final String DAILY_QUOTA_MESSAGE = "Quota exceeded for metric: "
+			+ "generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\n"
+			+ "Please retry in 9h3m1.2s.";
+
+	@Test
+	void aDailyQuotaFailsAtOnceWithoutRetryingAndSaysHowLongToWait() {
+		when(model.call(any(Prompt.class))).thenThrow(new ClientException(429, "RESOURCE_EXHAUSTED", DAILY_QUOTA_MESSAGE));
+
+		assertThatThrownBy(this::ask)
+				.isInstanceOfSatisfying(AiUnavailableException.class, e -> {
+					assertThat(e.reason()).isEqualTo(AiUnavailableException.Reason.DAILY_QUOTA_EXHAUSTED);
+					assertThat(e.retryAfter()).isEqualTo(Duration.ofHours(9).plusMinutes(3).plusMillis(1200));
+					assertThat(e.getMessage()).contains("daily quota").contains("about 9 hours");
+				});
+		verify(model, times(1)).call(any(Prompt.class));
+	}
+
+	@Test
+	void aDailyQuotaWithoutADelayAlsoFailsAtOnce() {
+		when(model.call(any(Prompt.class))).thenThrow(new ClientException(429, "RESOURCE_EXHAUSTED",
+				"Quota exceeded {\"quotaId\":\"GenerateRequestsPerDayPerProjectPerModel-FreeTier\"}"));
+
+		assertThatThrownBy(this::ask)
+				.isInstanceOfSatisfying(AiUnavailableException.class, e -> {
+					assertThat(e.reason()).isEqualTo(AiUnavailableException.Reason.DAILY_QUOTA_EXHAUSTED);
+					assertThat(e.retryAfter()).isNull();
+				});
+		verify(model, times(1)).call(any(Prompt.class));
+	}
+
+	@Test
+	void aRateLimitThatAsksForALongWaitFailsAtOnce() {
+		// the test configuration retries only waits up to 5 seconds
+		when(model.call(any(Prompt.class))).thenThrow(new ClientException(429, "RESOURCE_EXHAUSTED",
+				"Too many requests. Details: {\"retryDelay\":\"33s\"}"));
+
+		assertThatThrownBy(this::ask)
+				.isInstanceOfSatisfying(AiUnavailableException.class, e -> {
+					assertThat(e.reason()).isEqualTo(AiUnavailableException.Reason.RATE_LIMITED);
+					assertThat(e.retryAfter()).isEqualTo(Duration.ofSeconds(33));
+					assertThat(e.getMessage()).contains("about 33 seconds");
+				});
+		verify(model, times(1)).call(any(Prompt.class));
+	}
+
+	@Test
+	void aRateLimitThatPassesQuicklyIsRetriedAfterTheSuggestedWait() {
+		when(model.call(any(Prompt.class)))
+				.thenThrow(new ClientException(429, "RESOURCE_EXHAUSTED", "Slow down. Please retry in 20ms."))
+				.thenReturn(reply("{\"value\": \"after the wait\"}"));
+
+		long started = System.nanoTime();
+		assertThat(ask().value()).isEqualTo("after the wait");
+
+		verify(model, times(2)).call(any(Prompt.class));
+		assertThat((System.nanoTime() - started) / 1_000_000).isGreaterThanOrEqualTo(20);
+	}
+
+	@Test
+	void highDemandErrorsAreStillRetriedWithBackoff() {
+		when(model.call(any(Prompt.class)))
+				.thenThrow(new ServerException(503, "UNAVAILABLE", "This model is currently experiencing high demand."))
+				.thenThrow(new ServerException(503, "UNAVAILABLE", "This model is currently experiencing high demand."))
+				.thenReturn(reply("{\"value\": \"calmer now\"}"));
+
+		assertThat(ask().value()).isEqualTo("calmer now");
+		verify(model, times(3)).call(any(Prompt.class));
+	}
+
+	@Test
+	void persistentHighDemandGivesUpAfterTheLimitedAttemptsAsTemporarilyUnavailable() {
+		when(model.call(any(Prompt.class)))
+				.thenThrow(new ServerException(503, "UNAVAILABLE", "This model is currently experiencing high demand."));
+
+		assertThatThrownBy(this::ask)
+				.isInstanceOfSatisfying(AiUnavailableException.class, e -> {
+					assertThat(e.reason()).isEqualTo(AiUnavailableException.Reason.TEMPORARILY_UNAVAILABLE);
+					assertThat(e.retryAfter()).isNull();
+				});
+		verify(model, times(3)).call(any(Prompt.class));
 	}
 }

@@ -42,3 +42,5 @@ partsflow:
     retry:
       max-attempts: 3
       initial-backoff: 2s
+      # A 429 asking for a longer wait (a daily quota asks for hours) fails at once instead of being retried
+      max-suggested-delay: 20s

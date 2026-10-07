@@ -1,6 +1,8 @@
 package io.github.ale4694.partsflow.ai;
 
 import com.google.genai.Client;
+import com.google.genai.types.HttpOptions;
+import com.google.genai.types.HttpRetryOptions;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -30,7 +32,17 @@ class AiConfig {
 	@Bean
 	static Client googleGenAiClient(Environment environment) {
 		String apiKey = environment.getProperty("spring.ai.google.genai.api-key", "");
-		return Client.builder().apiKey(apiKey.isBlank() ? "not-configured" : apiKey).build();
+		return Client.builder().apiKey(apiKey.isBlank() ? "not-configured" : apiKey).httpOptions(httpOptions()).build();
+	}
+
+	/**
+	 * The SDK retries failed requests ON ITS OWN unless told otherwise: up to 5 attempts with waits of 1, 2, 4, 8 s
+	 * on 408/429/5xx (one call measured: 5 provider requests in 38 seconds). That multiplies our own retries and
+	 * spends the tiny free-tier quota (about 20 requests per day per model) on errors that cannot recover.
+	 * Retrying is {@link LlmGateway}'s job, so the SDK makes exactly one attempt.
+	 */
+	static HttpOptions httpOptions() {
+		return HttpOptions.builder().retryOptions(HttpRetryOptions.builder().attempts(1).build()).build();
 	}
 
 	/**

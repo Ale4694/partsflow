@@ -23,6 +23,8 @@ public record AiProperties(
 	public record Retry(
 			@DefaultValue("3") int maxAttempts,
 			@DefaultValue("2s") Duration initialBackoff,
-			@DefaultValue("2.0") double multiplier) {
+			@DefaultValue("2.0") double multiplier,
+			/** A 429 that asks us to wait longer than this is not retried: the user gets the answer at once. */
+			@DefaultValue("20s") Duration maxSuggestedDelay) {
 	}
 }

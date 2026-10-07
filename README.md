@@ -214,7 +214,7 @@ Interactive documentation: Swagger UI at `/swagger-ui.html`, OpenAPI JSON at `/v
 | `POST /api/ai/suggestions/{id}/accept` / `reject` | Decide on a suggestion |
 | `POST /api/ai/assistant` | Ask a question about stock in plain language |
 
-Errors are always [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) `application/problem+json`. The AI endpoints add a stable `code` field (`AI_KEY_MISSING`, `AI_REJECTED`, `AI_TEMPORARILY_UNAVAILABLE`, `AI_BAD_ANSWER`) that the web interface uses to show its own message:
+Errors are always [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) `application/problem+json`. The AI endpoints add a stable `code` field (`AI_KEY_MISSING`, `AI_REJECTED`, `AI_DAILY_QUOTA_EXHAUSTED`, `AI_RATE_LIMITED`, `AI_TEMPORARILY_UNAVAILABLE`, `AI_BAD_ANSWER`, plus `retryAfterSeconds` when known) that the web interface uses to show its own message:
 
 | Status | Meaning |
 | --- | --- |
@@ -247,6 +247,7 @@ In short: deterministic code for everything that follows fixed rules (XML parsin
 - Signed FatturaPA files (`.p7m`) and files with several documents are not supported yet.
 - Document-level discounts and currencies other than EUR are not handled in the FatturaPA import.
 - PDFs must contain text; scanned images (OCR) are not supported.
+- The Gemini free tier allows only about 20 requests per day per model (an assistant question uses at least two). When the daily quota is used up the AI endpoints answer `503` at once with `AI_DAILY_QUOTA_EXHAUSTED`; use another `LLM_MODEL` or wait. See [ADR 0009](docs/adr/0009-gemini-free-tier-and-synthetic-data.md).
 - There is no authentication: this is a portfolio project, not a production system.
 
 ## Roadmap

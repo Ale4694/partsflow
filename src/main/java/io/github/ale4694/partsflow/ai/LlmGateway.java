@@ -2,6 +2,7 @@ package io.github.ale4694.partsflow.ai;
 
 import com.google.genai.errors.ApiException;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.function.Supplier;
 import tools.jackson.core.JacksonException;
 import org.slf4j.Logger;
@@ -89,6 +90,15 @@ public class LlmGateway {
 				if (apiError != null) {
 					logProviderError(operation, apiError);
 				}
+				long waitMillis = backoffMillis;
+				if (apiError != null && apiError.code() == 429) {
+					// A rate limit is only worth retrying when it passes quickly (see QuotaAdvice)
+					QuotaAdvice advice = QuotaAdvice.from(apiError.message());
+					failFastOnLongWait(advice, retry, ex);
+					if (advice.suggestedDelay() != null) {
+						waitMillis = Math.max(backoffMillis, advice.suggestedDelay().toMillis());
+					}
+				}
 				if (apiError == null && !temporary) {
 					if (find(ex, JacksonException.class) != null) {
 						// The call worked but the answer is not the JSON we asked for: not a provider problem
@@ -106,9 +116,28 @@ public class LlmGateway {
 					throw new AiUnavailableException(AiUnavailableException.Reason.TEMPORARILY_UNAVAILABLE,
 							"The LLM is rate limited or temporarily unavailable. Please try again in a minute.", ex);
 				}
-				sleep(backoffMillis);
+				sleep(waitMillis);
 				backoffMillis = Math.round(backoffMillis * retry.multiplier());
 			}
+		}
+	}
+
+	/**
+	 * Daily quota, or a wait longer than {@code maxSuggestedDelay}: nothing we do inside this request can fix it,
+	 * and every retry would only make the user wait and spend more quota. Fail at once and say how long to wait.
+	 */
+	private void failFastOnLongWait(QuotaAdvice advice, AiProperties.Retry retry, RuntimeException cause) {
+		Duration delay = advice.suggestedDelay();
+		String wait = delay == null ? "" : " Try again in about " + QuotaAdvice.describe(delay) + ".";
+		if (advice.daily()) {
+			throw new AiUnavailableException(AiUnavailableException.Reason.DAILY_QUOTA_EXHAUSTED,
+					"The daily quota of the AI service is exhausted (free tier: about 20 requests per day per model)."
+							+ wait,
+					delay, cause);
+		}
+		if (delay != null && delay.compareTo(retry.maxSuggestedDelay()) > 0) {
+			throw new AiUnavailableException(AiUnavailableException.Reason.RATE_LIMITED,
+					"The AI service is rate limited." + wait, delay, cause);
 		}
 	}
 

@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
  * Error mapping owned by the AI feature. Besides the usual ProblemDetail fields every AI error carries a stable
- * "code": AI_KEY_MISSING, AI_REJECTED, AI_TEMPORARILY_UNAVAILABLE (all 503) or AI_BAD_ANSWER (502).
+ * "code": AI_KEY_MISSING, AI_REJECTED, AI_DAILY_QUOTA_EXHAUSTED, AI_RATE_LIMITED, AI_TEMPORARILY_UNAVAILABLE (all
+ * 503) or AI_BAD_ANSWER (502). When the provider said how long to wait, "retryAfterSeconds" is added too.
  * Higher precedence than the shared catch-all in {@code common}.
  */
 @RestControllerAdvice
@@ -18,8 +19,13 @@ public class AiExceptionHandler {
 
 	@ExceptionHandler(AiUnavailableException.class)
 	ProblemDetail handleUnavailable(AiUnavailableException ex) {
-		return withCode(ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage()),
-				ex.reason().code());
+		ProblemDetail problem = withCode(
+				ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage()), ex.reason().code());
+		if (ex.retryAfter() != null) {
+			// Lets the web UI say how long to wait
+			problem.setProperty("retryAfterSeconds", Math.max(1, Math.round(ex.retryAfter().toMillis() / 1000.0)));
+		}
+		return problem;
 	}
 
 	@ExceptionHandler(LlmResponseException.class)
