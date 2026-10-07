@@ -29,6 +29,13 @@ spring:
       pageable:
         max-page-size: 100
 
+management:
+  endpoints:
+    web:
+      exposure:
+        # Only the health endpoint is exposed (used by the Docker healthcheck): no env, beans, metrics...
+        include: health
+
 partsflow:
   ai:
     max-agent-steps: 5

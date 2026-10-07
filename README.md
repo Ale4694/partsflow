@@ -86,7 +86,7 @@ You need Docker (with Compose). One command starts PostgreSQL, the application a
 docker compose up --build
 ```
 
-Then open **http://localhost:8081** for the web interface (change the port with `WEB_PORT`), or **http://localhost:8080/swagger-ui.html** to explore the API directly.
+The web interface starts only after the application reports itself healthy (`/actuator/health`), so the first page load never gets a "502 Bad Gateway" while the backend is still starting. Then open **http://localhost:8081** for the web interface (change the port with `WEB_PORT`), or **http://localhost:8080/swagger-ui.html** to explore the API directly.
 
 The AI features are optional. Without an API key every `/api/ai/**` endpoint answers `503` and the rest of the application works normally. To enable them, get a free key from Google AI Studio and export it **in your shell** before starting (it is passed to the container, never stored in a file):
 
@@ -206,6 +206,7 @@ Interactive documentation: Swagger UI at `/swagger-ui.html`, OpenAPI JSON at `/v
 | `POST /api/imports/{id}/lines/{lineId}/skip` | Do not load a pending line into stock |
 | `POST /api/imports/{id}/confirm` | Confirm the draft: writes the stock movements |
 | `DELETE /api/imports/{id}` | Discard a draft that was not confirmed |
+| `GET /actuator/health` | Health check used by Docker Compose (the only Actuator endpoint exposed) |
 | `GET /api/ai/status` | Whether the AI features are available |
 | `POST /api/ai/imports/pdf` | Upload a supplier PDF (invoice, credit note, delivery note): creates a draft |
 | `POST /api/ai/imports/{id}/suggest-matches` | Ask the LLM to propose items for pending lines |

@@ -27,13 +27,22 @@ services:
       # Passed through from your shell or .env. Empty = the AI endpoints answer 503, everything else works.
       LLM_API_KEY: ${LLM_API_KEY:-}
       LLM_MODEL: ${LLM_MODEL:-gemini-3.5-flash}
+    healthcheck:
+      # The image has curl. "UP" only after Flyway ran and the database answers.
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 20s
     ports:
       - "8080:8080"
 
   web:
     build: ./frontend
     depends_on:
-      - app
+      # nginx starts only when the app can answer, otherwise the first requests would get 502
+      app:
+        condition: service_healthy
     ports:
       # The web interface. Change the host port with WEB_PORT if 8081 is taken.
       - "${WEB_PORT:-8081}:8080"
