@@ -1,0 +1,173 @@
+<p><a routerLink="/importazioni">‹ Tutte le importazioni</a></p>
+
+@if (draft.hasValue()) {
+  @let d = draft.value();
+
+  <header class="page-header">
+    <h1>{{ d.tipoDocumento }} n. {{ d.number }}</h1>
+    <app-draft-status [status]="d.status" />
+  </header>
+
+  @if (d.source === 'PDF') {
+    <p class="banner">Questa bozza è stata letta da un PDF con l’AI: controlla con attenzione ogni riga.</p>
+  }
+
+  <section class="card">
+    <dl class="summary">
+      <div>
+        <dt>Fornitore</dt>
+        <dd>{{ d.supplierName }}</dd>
+      </div>
+      <div>
+        <dt>Data documento</dt>
+        <dd>{{ d.date | itDate }}</dd>
+      </div>
+      <div>
+        <dt>Totale</dt>
+        <dd>{{ d.total | money }}</dd>
+      </div>
+      <div>
+        <dt>Origine</dt>
+        <dd>{{ d.source === 'XML' ? 'Fattura elettronica XML' : 'PDF (AI)' }}</dd>
+      </div>
+      <div>
+        <dt>Caricata il</dt>
+        <dd>{{ d.createdAt | itDateTime }}</dd>
+      </div>
+      @if (d.confirmedAt) {
+        <div>
+          <dt>Confermata il</dt>
+          <dd>{{ d.confirmedAt | itDateTime }}</dd>
+        </div>
+      }
+      @if (d.ddtReferences.length > 0) {
+        <div>
+          <dt>DDT collegati</dt>
+          <dd>
+            @for (ddt of d.ddtReferences; track ddt.number) {
+              <div>{{ ddt.number }} @if (ddt.date) { del {{ ddt.date | itDate }} }</div>
+            }
+          </dd>
+        </div>
+      }
+    </dl>
+  </section>
+
+  <section class="card">
+    <div class="page-header">
+      <h2>Righe</h2>
+      @if (d.status === 'DRAFT' && d.pendingLines > 0) {
+        <span class="badge badge-warning">{{ d.pendingLines }} da verificare</span>
+      }
+      @if (ai.available() && d.status === 'DRAFT' && d.pendingLines > 0) {
+        <button type="button" class="btn btn-small" [disabled]="suggesting() || busy()" (click)="suggestMatches()">
+          {{ suggesting() ? 'Richiesta in corso…' : 'Suggerisci abbinamenti (AI)' }}
+        </button>
+      }
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Codice fornitore</th>
+            <th>Descrizione</th>
+            <th class="num">Quantità</th>
+            <th class="num">Prezzo unit.</th>
+            <th class="num">Totale riga</th>
+            <th class="num">IVA</th>
+            <th>Stato</th>
+            <th>Articolo</th>
+            <th class="num">Effetto magazzino</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (line of d.lines; track line.id) {
+            <tr>
+              <td>{{ line.lineNumber }}</td>
+              <td>{{ line.supplierCode ?? '—' }}</td>
+              <td>{{ line.description }}</td>
+              <td class="num">{{ line.quantity | quantity }} {{ line.unit }}</td>
+              <td class="num">{{ line.unitPrice | money }}</td>
+              <td class="num">{{ line.totalPrice | money }}</td>
+              <td class="num">{{ line.vatRate | percent2 }}</td>
+              <td><app-line-status [status]="line.status" /></td>
+              <td>{{ line.itemCode ?? '—' }}</td>
+              <td class="num">{{ line.stockDelta | quantity }}</td>
+              <td class="actions">
+                @if (d.status === 'DRAFT' && line.status === 'PENDING_REVIEW') {
+                  <button type="button" class="btn btn-small" [disabled]="busy()" (click)="toggleResolving(line)">
+                    Scegli articolo
+                  </button>
+                  <button type="button" class="btn btn-small" [disabled]="busy()" (click)="skip(line)">Ignora</button>
+                }
+              </td>
+            </tr>
+            @if (suggestionFor(line); as suggestion) {
+              <tr class="extra-row">
+                <td colspan="11">
+                  <div class="suggestion">
+                    <div>
+                      <span class="badge">Suggerimento AI</span>
+                      @if (suggestion.itemCode) {
+                        <strong>{{ suggestion.itemCode }}</strong> — {{ suggestion.itemDescription }}
+                      } @else {
+                        <strong>Nessun articolo proposto</strong>
+                      }
+                      <div class="muted">{{ suggestion.justification }}</div>
+                    </div>
+                    <div class="actions">
+                      @if (suggestion.itemId) {
+                        <button type="button" class="btn btn-small btn-primary" [disabled]="busy()" (click)="accept(suggestion)">
+                          Accetta
+                        </button>
+                      }
+                      <button type="button" class="btn btn-small" [disabled]="busy()" (click)="reject(suggestion)">
+                        Rifiuta
+                      </button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            }
+            @if (resolvingLineId() === line.id) {
+              <tr class="extra-row">
+                <td colspan="11">
+                  <strong>Scegli l’articolo per «{{ line.description }}»</strong>
+                  <p class="muted">Il codice del fornitore verrà ricordato: la prossima fattura sarà riconosciuta da sola.</p>
+                  <app-item-picker label="Cerca l’articolo per questa riga" (picked)="resolve(line, $event)" />
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card footer-actions">
+    <div>
+      @if (d.status === 'CONFIRMED') {
+        <span class="muted">Bozza confermata: i movimenti di magazzino sono stati registrati.</span>
+      } @else if (d.pendingLines > 0) {
+        <span class="muted">Per confermare, abbina o ignora tutte le righe da verificare.</span>
+      } @else {
+        <span class="muted">Tutte le righe sono state controllate: puoi confermare.</span>
+      }
+    </div>
+    @if (d.status === 'DRAFT') {
+      <div class="actions">
+        <button type="button" class="btn btn-danger" [disabled]="busy()" (click)="discard()">Scarta bozza</button>
+        <button type="button" class="btn btn-primary" [disabled]="!canConfirm() || busy()" (click)="confirm()">
+          Conferma
+        </button>
+      </div>
+    }
+  </section>
+} @else if (draft.isLoading()) {
+  <p class="loading">Caricamento bozza…</p>
+} @else if (draft.error()) {
+  <p class="banner banner-error">Bozza non trovata.</p>
+}

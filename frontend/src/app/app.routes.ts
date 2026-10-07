@@ -22,5 +22,15 @@ export const routes: Routes = [
     title: 'Magazzino',
     loadComponent: () => import('./inventory/movements').then((m) => m.Movements),
   },
+  {
+    path: 'importazioni',
+    title: 'Importazioni',
+    loadComponent: () => import('./imports/import-list').then((m) => m.ImportList),
+  },
+  {
+    path: 'importazioni/:id',
+    title: 'Bozza di importazione',
+    loadComponent: () => import('./imports/draft-detail').then((m) => m.DraftDetail),
+  },
   { path: '**', redirectTo: '' },
 ];

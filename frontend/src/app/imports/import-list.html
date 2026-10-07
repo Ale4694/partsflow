@@ -1,0 +1,82 @@
+<header class="page-header">
+  <h1>Importazioni</h1>
+  <div class="actions">
+    <label class="btn btn-primary" [class.disabled]="uploading()">
+      Carica fattura XML
+      <input type="file" accept=".xml,text/xml,application/xml" hidden [disabled]="uploading()" (change)="upload($event, 'xml')" />
+    </label>
+    @if (ai.available()) {
+      <label class="btn" [class.disabled]="uploading()">
+        Carica PDF (AI)
+        <input type="file" accept=".pdf,application/pdf" hidden [disabled]="uploading()" (change)="upload($event, 'pdf')" />
+      </label>
+    }
+  </div>
+</header>
+
+<p class="muted">
+  Il caricamento crea una <strong>bozza</strong>: il magazzino cambia solo quando la confermi.
+  @if (!ai.available()) {
+    L’importazione da PDF richiede l’AI, al momento non disponibile.
+  }
+</p>
+
+@if (uploading()) {
+  <p class="banner">Caricamento in corso…</p>
+}
+
+<section class="card">
+  <div class="field filter">
+    <label for="status-filter">Stato</label>
+    <select #statusSelect id="status-filter" (change)="setStatus(statusSelect.value)">
+      @for (filter of filters; track filter.label) {
+        <option [value]="filter.value ?? ''">{{ filter.label }}</option>
+      }
+    </select>
+  </div>
+
+  @if (drafts.isLoading() && !drafts.hasValue()) {
+    <p class="loading">Caricamento importazioni…</p>
+  } @else if (drafts.hasValue()) {
+    @if (drafts.value().content.length === 0) {
+      <p class="empty">Nessuna importazione. Carica una fattura XML per iniziare.</p>
+    } @else {
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Stato</th>
+              <th>Fornitore</th>
+              <th>Documento</th>
+              <th>Data</th>
+              <th class="num">Totale</th>
+              <th>Caricata il</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (draft of drafts.value().content; track draft.id) {
+              <tr>
+                <td><app-draft-status [status]="draft.status" /></td>
+                <td>{{ draft.supplierName }}</td>
+                <td>{{ draft.tipoDocumento }} n. {{ draft.number }}</td>
+                <td>{{ draft.date | itDate }}</td>
+                <td class="num">{{ draft.total | money }}</td>
+                <td>{{ draft.createdAt | itDateTime }}</td>
+                <td class="actions">
+                  <a class="btn btn-small" [routerLink]="['/importazioni', draft.id]">Apri</a>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <app-pager
+        [page]="drafts.value().page"
+        [totalPages]="drafts.value().totalPages"
+        [totalElements]="drafts.value().totalElements"
+        (pageChange)="page.set($event)"
+      />
+    }
+  }
+</section>

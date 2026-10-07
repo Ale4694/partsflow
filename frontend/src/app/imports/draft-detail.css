@@ -1,0 +1,38 @@
+.summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: var(--space-3) var(--space-5);
+  margin: 0;
+}
+
+.summary dt {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+}
+
+.summary dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.extra-row td {
+  background: var(--color-bg);
+}
+
+.suggestion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.footer-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
