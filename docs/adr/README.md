@@ -17,3 +17,4 @@ Each record has the same shape: **Context**, **Decision**, **Alternatives consid
 | [0009](0009-gemini-free-tier-and-synthetic-data.md) | Gemini free tier as LLM provider, and only synthetic data |
 | [0010](0010-angular-spa-behind-nginx.md) | Angular single-page app served by nginx, which proxies the API |
 | [0011](0011-configurable-llm-provider.md) | A configurable LLM provider: Gemini or any OpenAI-compatible service |
+| [0012](0012-semantic-search-with-pgvector.md) | Semantic catalog search: pgvector in the same database, hybrid ranking, text fallback |

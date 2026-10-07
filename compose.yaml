@@ -31,6 +31,10 @@ services:
       LLM_PROVIDER:
       LLM_BASE_URL:
       LLM_MODEL:
+      # Semantic search (README, "Semantic search"): all optional, same pass-through rule as above
+      LLM_EMBEDDING_MODEL:
+      LLM_EMBEDDING_DIMENSIONS:
+      LLM_EMBEDDINGS_ENABLED:
     healthcheck:
       # The image has curl. "UP" only after Flyway ran and the database answers.
       test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]

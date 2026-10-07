@@ -16,6 +16,7 @@ This is a portfolio project. The code is written to be read: simple, explicit, a
 | **Inventory** | Record stock movements (IN/OUT), see current stock, list items below their reorder threshold. Stock never goes negative, even with concurrent updates. |
 | **FatturaPA import** | Upload an XML invoice or credit note. It becomes a **draft**; lines with unknown supplier codes wait for review. Only **confirming** the draft changes the stock. Importing the same document twice is rejected. |
 | **Web interface** | An Italian-language Angular app on top of the API: dashboard, suppliers, items, warehouse, the import review screen and the AI assistant. |
+| **Semantic search** | Find an item even when the words differ ("filtro olio Fiat Panda" finds "Cartuccia lubrificante motore 1.2 FIRE"): embeddings in PostgreSQL (pgvector) combined with fuzzy text search. |
 | **AI agent** | Turn a supplier **PDF** into a draft, get **match suggestions** for unknown codes, and ask an **inventory assistant** questions in plain language. |
 
 ## Architecture
@@ -142,6 +143,9 @@ The AI features need a language model. Two kinds of provider are supported, chos
 | `LLM_API_KEY` | the key of the service | empty: the AI is off |
 | `LLM_MODEL` | model name | `gemini-3.5-flash` for Gemini; required for `openai-compatible` |
 | `LLM_BASE_URL` | address of the service, **including its version path** (usually ending in `/v1`) | only for `openai-compatible`, required there |
+| `LLM_EMBEDDING_MODEL` | embedding model for the [semantic search](#semantic-search) | `gemini-embedding-001` for Gemini; required for `openai-compatible` |
+| `LLM_EMBEDDING_DIMENSIONS` | size of the embedding vectors; fixed in the database when it is first created | `768` |
+| `LLM_EMBEDDINGS_ENABLED` | `false` = text search only, even with a key | `true` |
 
 **Gemini** (Google AI Studio key; the default):
 
@@ -166,6 +170,62 @@ Model names change often, so check the service's documentation. Pick a model tha
 If something is missing (no key, or no address or model for `openai-compatible`) the application still starts: the AI endpoints answer `503`, the UI says the AI is not configured, and everything else works. Rate limits, an exhausted quota or credit, an invalid key or a wrong model name are reported with the same error codes for both kinds of provider (see [ADR 0011](docs/adr/0011-configurable-llm-provider.md)).
 
 **Privacy.** Whatever you send reaches the provider. Free tiers (Gemini's, and most free plans of other services) may use your prompts to improve their models, so use **only synthetic data** there, as this repository does. For real supplier documents use a paid plan whose terms exclude training, or a model you host yourself.
+
+## Semantic search
+
+Searching by words fails when the words differ: the query "filtro olio Fiat Panda" and the item "Cartuccia lubrificante motore 1.2 FIRE" share nothing. The **semantic search** (RAG: retrieval first, generation after) finds it anyway:
+
+```mermaid
+flowchart LR
+    q([query]) --> e[embedding model<br/>one request, cached]
+    e --> v[pgvector<br/>nearest by cosine]
+    q --> t[pg_trgm<br/>similar spelling]
+    v --> f[fusion<br/>Reciprocal Rank Fusion]
+    t --> f
+    f --> r([items with score<br/>and mode])
+    r -.-> l[candidates for the LLM:<br/>match suggestions, assistant]
+```
+
+- **Indexing.** Every item (code, description, supplier codes) gets an *embedding*, stored in `item_embedding` in the same PostgreSQL. It is computed in the background after an item is saved and by a job every few minutes (also the retry after a failure). Only items whose text changed are re-embedded (SHA-256 of the text), and texts go to the provider in batches of up to 100 per request. Saving an item never waits for, or fails because of, the embedding service.
+- **Search.** `GET /api/items/search?q=...` ranks by meaning (cosine similarity of the vectors) and by spelling (pg_trgm), and fuses the two rankings with Reciprocal Rank Fusion. It returns each item's `score`, the two raw similarities, and the `mode`. `GET /api/items?q=` is the plain "contains" filter and is unchanged.
+- **Fallback.** Without a key or an embedding model, with embeddings switched off, before the catalog is indexed, with a vector size that differs from the database, or when the provider fails (quota, overload), the search silently runs on spelling alone. The response says `mode: TEXT` and why (`fallbackReason`), and the UI shows "ricerca testuale" instead of "ricerca intelligente".
+- **Where it is used.** The Articoli search box and the item picker (resolving pending draft lines, supplier codes, movements); the candidates the LLM chooses from when suggesting matches for pending invoice lines (the retrieval step); the assistant's item search.
+- **Status.** `GET /api/ai/embeddings/status` shows the model, the vector size, how many items are indexed or pending, and a pause after a quota error; `POST /api/ai/embeddings/reindex` embeds what is missing now.
+- **Free tier.** One embedding request per search, an in-memory cache for repeated queries, batch indexing: 125 items cost two requests. Gemini's free tier allows about 1000 embedding requests per day (check the current limits). Nothing but the number of texts is logged, never a key or a text.
+- **Changing the model or the size.** Other model, same size: just restart, the catalog is re-embedded by itself. Other `LLM_EMBEDDING_DIMENSIONS`: see [ADR 0012](docs/adr/0012-semantic-search-with-pgvector.md) (the column is recreated). OpenAI-compatible services: set `LLM_EMBEDDING_MODEL` to an embedding model of that service (not every service has one; the vector size must be 768, or set `LLM_EMBEDDING_DIMENSIONS` before the first start).
+- **Privacy.** Item texts and search queries are sent to the provider: synthetic data only on free tiers (see above).
+
+### Try it with the demo catalog
+
+The demo data (about 125 invented Italian parts with varied wording, 4 invented suppliers and a demo invoice) is loaded **only** with the `demo` profile, never by the migrations:
+
+```bash
+export LLM_API_KEY=...        # your own key: without it the search is text-only
+docker compose -f compose.yaml -f compose.demo.yaml up --build
+```
+
+Or without Docker for the app: `SPRING_PROFILES_ACTIVE=demo ./mvnw spring-boot:run` (with `docker compose up db` running). The catalog is loaded once (re-running does nothing) and embedded in the background; `GET /api/ai/embeddings/status` shows `pending: 0` when it is ready, usually within a minute. Then open http://localhost:8081, go to **Articoli** and try these queries, comparing them with the plain text search (`GET /api/items/search?q=...&mode=text`):
+
+| Query | What a good semantic search should bring up | Why spelling alone struggles |
+| --- | --- | --- |
+| `filtro olio Fiat Panda` | *Cartuccia lubrificante motore 1.2 FIRE* | no word in common |
+| `batteria per l'auto con start e stop` | *Batteria AGM 12V 70Ah ... start&stop* and *Accumulatore 12V 60Ah* | "accumulatore" is a synonym of "batteria" |
+| `gomme da neve 195/65 R15` | *Gomma termica M+S 195/65R15 91T* | "gomma termica M+S" is how this catalog says "winter tyre" |
+| `liquido anticongelante per il motore` | *Antigelo concentrato -37°C* and the radiator liquids | different words for the same job |
+| `kit per cambiare la cinghia di distribuzione` | *Kit distribuzione cinghia + tenditore + pompa acqua 1.6 HDi* | a long sentence against a terse description |
+
+(These are what the design aims at, not measured promises: the real quality depends on the model. Measure it with the eval below.)
+
+To see the retrieval step of RAG at work, upload `src/main/resources/demo/fattura-demo-bianchi.xml` in **Importazioni**: its five lines are written in the supplier's own words ("FILTRO OLIO X PANDA 1.2 8V FIRE", "KIT CINGHIA DISTRIB. + POMPA H2O 1.6 HDI"...) with codes the system does not know, so each line waits for review. Click *Suggerisci abbinamenti (AI)*: the candidates the LLM sees come from the hybrid search. The sample invoices of `src/test/resources/fatturapa/` also work against the demo catalog.
+
+### Measure the retrieval
+
+`RetrievalEvalTest` loads the demo catalog, embeds it, searches 20 queries by spelling only and with the hybrid search, and reports how often the expected item is in the top 5 (and the mean reciprocal rank). It is **strictly opt-in**, like the extraction eval: it runs only when `LLM_API_KEY` is set **and** `LLM_EVAL=true`. It is cheap on purpose: the catalog is embedded in 2 batch requests and all queries in 1, so **3 provider requests** in total.
+
+```bash
+export LLM_API_KEY=...        # your own key
+LLM_EVAL=true ./mvnw -Dtest=RetrievalEvalTest test    # report in target/retrieval-eval-report.txt
+```
 
 ## Web interface
 
@@ -232,6 +292,8 @@ Interactive documentation: Swagger UI at `/swagger-ui.html`, OpenAPI JSON at `/v
 | `GET/POST /api/suppliers/{id}/item-codes`, `GET/PUT/DELETE .../{codeId}` | A supplier's article codes mapped to our items |
 | `POST /api/inventory/movements` | Record an IN or OUT movement (`409` if stock would go negative) |
 | `GET /api/inventory/movements?itemId=` | Movement history, newest first |
+| `GET /api/items/search?q=&mode=hybrid\|text&limit=` | Smart item search: meaning and spelling, with `score`, `mode` and `fallbackReason` |
+| `GET /api/ai/embeddings/status`, `POST /api/ai/embeddings/reindex` | State of the semantic-search index / embed what is missing now |
 | `GET /api/inventory/stock` | Every item with its current stock (ordered by code) |
 | `GET /api/inventory/stock/{itemId}` | Current stock of an item |
 | `GET /api/inventory/low-stock` | Items below their reorder threshold |
@@ -275,6 +337,7 @@ The reasoning behind each choice, with the alternatives that were considered, is
 9. [Gemini free tier, and why only synthetic data](docs/adr/0009-gemini-free-tier-and-synthetic-data.md)
 10. [Angular single-page app behind an nginx reverse proxy](docs/adr/0010-angular-spa-behind-nginx.md)
 11. [A configurable LLM provider](docs/adr/0011-configurable-llm-provider.md)
+12. [Semantic search with pgvector, hybrid ranking and text fallback](docs/adr/0012-semantic-search-with-pgvector.md)
 
 In short: deterministic code for everything that follows fixed rules (XML parsing, totals, stock arithmetic); the LLM only where judgment is needed (reading a messy PDF, deciding whether two product descriptions are the same part); and a person always in the loop before the inventory changes.
 
@@ -283,6 +346,7 @@ In short: deterministic code for everything that follows fixed rules (XML parsin
 - Signed FatturaPA files (`.p7m`) and files with several documents are not supported yet.
 - Document-level discounts and currencies other than EUR are not handled in the FatturaPA import.
 - PDFs must contain text; scanned images (OCR) are not supported.
+- Semantic search needs an embedding model: Gemini has one, other OpenAI-compatible services may not (then the search is text-only). The vector size is fixed in the database when it is created.
 - The Gemini free tier allows only about 20 requests per day per model (an assistant question uses at least two). When the daily quota is used up the AI endpoints answer `503` at once with `AI_DAILY_QUOTA_EXHAUSTED`; use another `LLM_MODEL` or wait. See [ADR 0009](docs/adr/0009-gemini-free-tier-and-synthetic-data.md).
 - There is no authentication: this is a portfolio project, not a production system.
 

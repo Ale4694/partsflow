@@ -56,6 +56,15 @@ Milestones are built in order. Each one ends with a passing `./mvnw verify` and 
 - [x] Incomplete configuration means "AI not configured" (503), never a startup failure
 - [x] Tests with mocked errors and local fake servers for both providers; README "Choosing the LLM provider" and ADR 0011
 
+## M8 — Semantic catalog search (RAG)
+- [x] pgvector in the same PostgreSQL: `item_embedding` (vector 768, HNSW, cosine), written by hand in Flyway V6 and explicit SQL
+- [x] Embeddings through Spring AI for Gemini and for OpenAI-compatible services (`LLM_EMBEDDING_MODEL`, `LLM_EMBEDDING_DIMENSIONS`), one request per batch, same retry/quota/logging policy as chat
+- [x] Background indexing with change detection by hash, never blocking item saves, pause after quota errors; startup guard for the vector size
+- [x] Hybrid search (pgvector cosine and pg_trgm fused with Reciprocal Rank Fusion) with text fallback and a query cache; `GET /api/items/search` reports score and mode
+- [x] Used by the item picker and Articoli search, the match suggestions (retrieval step before the LLM) and the assistant
+- [x] Demo catalog (~125 invented items, 4 suppliers, a demo invoice) loaded only with the `demo` profile
+- [x] Fake-model tests; opt-in retrieval eval (3 provider requests); README section and ADR 0012
+
 ## Later / out of scope for now
 - Signed FatturaPA files (`.p7m`)
 - FatturaPA files containing several documents (several `FatturaElettronicaBody`)
