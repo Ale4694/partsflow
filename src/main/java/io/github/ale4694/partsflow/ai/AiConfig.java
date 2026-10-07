@@ -2,10 +2,10 @@ package io.github.ale4694.partsflow.ai;
 
 import com.google.genai.Client;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.core.retry.RetryPolicy;
 import org.springframework.core.retry.RetryTemplate;
 
@@ -22,9 +22,14 @@ class AiConfig {
 	 * Without this bean the Spring AI starter refuses to start when LLM_API_KEY is empty, which would take the
 	 * whole application down. A placeholder lets the app start; {@link LlmGateway} never calls the model unless a
 	 * real key is configured, so the placeholder is never sent anywhere.
+	 * <p>
+	 * The key is read from the {@link Environment}, NOT with {@code @Value}: this method is static and the bean is
+	 * created very early, before Spring can resolve {@code ${...}} placeholders in {@code @Value}. The client would
+	 * then hold the literal text "${spring.ai.google.genai.api-key:}" and Gemini would answer "API key not valid".
 	 */
 	@Bean
-	static Client googleGenAiClient(@Value("${spring.ai.google.genai.api-key:}") String apiKey) {
+	static Client googleGenAiClient(Environment environment) {
+		String apiKey = environment.getProperty("spring.ai.google.genai.api-key", "");
 		return Client.builder().apiKey(apiKey.isBlank() ? "not-configured" : apiKey).build();
 	}
 

@@ -10,6 +10,9 @@ The AI features need an LLM. This is a public portfolio project that should run 
 - **The key** is read only from the `LLM_API_KEY` environment variable (`spring.ai.google.genai.api-key=${LLM_API_KEY:}`). It is never in a file, never logged, and `.env.example` contains no real value.
 - **Low rate limits are expected.** The gateway retries a few times with exponential backoff on HTTP 429 and temporary 5xx errors, then returns `503` with a clear message instead of failing. Spring AI's own retry (which can wait for minutes) is switched off so there is one predictable policy. The eval test pauses between calls.
 - **No key is a normal state.** The Spring AI starter refuses to start with an empty key, which would take the whole application down. A placeholder client bean lets the application start; the gateway checks the real key first and never calls the model without it, so AI endpoints answer `503` and everything else works. A test pins this behaviour even when a key exists in the environment.
+- **Provider errors are diagnosable.** When the provider answers 4xx or 5xx, `LlmGateway` logs one WARN line with the HTTP status and the provider's own `error.status` and `error.message` (truncated; never the key, headers or prompts). "HTTP 400" alone is not enough: Gemini uses 400 for an invalid key, an invalid request and a failed precondition alike.
+- **The key is read from the `Environment` in `AiConfig`, not with `@Value`.** The client bean is `static` (so Spring can create it early without the "cannot enhance @Configuration" warning), and an early bean does not get `${...}` placeholders resolved: with `@Value` the SDK client held the literal text `${spring.ai.google.genai.api-key:}` and every call failed with `API_KEY_INVALID`, while the gateway (a normal bean) reported the AI as available. A test asserts the key the client really holds.
+- **Key formats.** AI Studio now issues keys that start with `AQ.` (the older ones start with `AIza`). Both work with the SDK on the Gemini Developer API; nothing in the application depends on the prefix.
 - **Only synthetic data is ever used** for fixtures, PDFs, examples and the eval. On the free tier, Google may use submitted content to improve its products, so real supplier invoices (company names, VAT numbers, prices) must not be sent. Every name and VAT number in this repository is invented.
 - The application code depends on Spring AI's `ChatClient` and on our own `LlmGateway`, not on Gemini classes (except to recognise HTTP errors), so another provider is a matter of replacing the starter and configuration.
 
@@ -23,5 +26,5 @@ The AI features need an LLM. This is a public portfolio project that should run 
 ## Consequences
 
 - Anyone can run all features with a free key, and nothing breaks without one.
-- Free-tier quotas can make AI endpoints answer `503` under load; clients must handle that.
+- Free-tier quotas can make AI endpoints answer `503` under load; clients must handle that. In practice the provider also answers "high demand" (503) at busy times, and one call with the default model can take 30-40 seconds, so a request that uses all its retries may take a couple of minutes.
 - The project is not suitable for real business documents as it stands. Moving to production means a paid or self-hosted model, authentication, and a data-protection review.

@@ -140,4 +140,42 @@ class LlmGatewayTest {
 		assertThat(line).doesNotContain("CONFIDENTIAL-INVOICE-TEXT").doesNotContain("TOP-SECRET-ANSWER")
 				.doesNotContain("a-test-key");
 	}
+
+	@Test
+	void aProviderRejectionIsLoggedAtWarnWithItsStatusAndMessage() {
+		when(model.call(any(Prompt.class))).thenThrow(new ClientException(400, "INVALID_ARGUMENT",
+				"tools[0].function_declarations[3].parameters.properties: should be non-empty for OBJECT type"));
+
+		assertThatThrownBy(() -> gateway.structured("inventory-assistant", "system", "CONFIDENTIAL-QUESTION",
+				Answer.class)).isInstanceOf(AiUnavailableException.class);
+
+		ILoggingEvent warning = logs.list.stream().filter(e -> e.getLevel() == Level.WARN).findFirst().orElseThrow();
+		assertThat(warning.getFormattedMessage()).contains("operation=inventory-assistant").contains("httpStatus=400")
+				.contains("providerStatus=INVALID_ARGUMENT")
+				.contains("should be non-empty for OBJECT type")
+				.doesNotContain("a-test-key").doesNotContain("CONFIDENTIAL-QUESTION");
+	}
+
+	@Test
+	void aLongProviderMessageIsTruncatedInTheLog() {
+		when(model.call(any(Prompt.class))).thenThrow(new ClientException(400, "INVALID_ARGUMENT", "x".repeat(5000)));
+
+		assertThatThrownBy(this::ask).isInstanceOf(AiUnavailableException.class);
+
+		String warning = logs.list.stream().filter(e -> e.getLevel() == Level.WARN).findFirst().orElseThrow()
+				.getFormattedMessage();
+		assertThat(warning).hasSizeLessThan(800).endsWith("...");
+	}
+
+	@Test
+	void temporaryErrorsAreAlsoLoggedWithTheProviderMessage() {
+		when(model.call(any(Prompt.class)))
+				.thenThrow(new ClientException(429, "RESOURCE_EXHAUSTED", "Quota exceeded for metric"))
+				.thenReturn(reply("{\"value\": \"ok\"}"));
+
+		ask();
+
+		assertThat(logs.list.stream().filter(e -> e.getLevel() == Level.WARN).map(ILoggingEvent::getFormattedMessage))
+				.singleElement().asString().contains("httpStatus=429").contains("Quota exceeded for metric");
+	}
 }
