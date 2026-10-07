@@ -7,6 +7,8 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
 /** Settings of the semantic search, under {@code partsflow.embeddings} in application.yml. */
 @ConfigurationProperties("partsflow.embeddings")
 public record EmbeddingProperties(
+		/** false = never use embeddings (text search only), even if a key is configured. */
+		@DefaultValue("true") boolean enabled,
 		/** Embedding model (LLM_EMBEDDING_MODEL). Gemini has a default; an OpenAI-compatible service needs one. */
 		@DefaultValue("") String model,
 		/**

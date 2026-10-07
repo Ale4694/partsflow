@@ -36,7 +36,7 @@ class EmbeddingGatewayTest {
 
 	@SuppressWarnings("unchecked")
 	private EmbeddingGateway gateway(String apiKey, String embeddingModel, int batchSize, EmbeddingModel actual) {
-		AiProperties ai = new AiProperties(5, 5, 0.1, 10, 30000,
+		AiProperties ai = new AiProperties(5, 5, 10, 30000,
 				new AiProperties.Retry(3, Duration.ofMillis(1), 2.0, Duration.ofSeconds(5)),
 				AiProperties.Provider.GEMINI, apiKey, "", "");
 		ObjectProvider<EmbeddingModel> provider = mock(ObjectProvider.class);

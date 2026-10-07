@@ -27,7 +27,9 @@ public class FakeEmbeddingModel implements EmbeddingModel {
 			Map.entry("panda", "panda"), Map.entry("fire", "panda"),
 			Map.entry("fiat", "fiat"),
 			Map.entry("pastiglie", "freno"), Map.entry("freni", "freno"), Map.entry("freno", "freno"),
-			Map.entry("brake", "freno"), Map.entry("pads", "freno"));
+			Map.entry("brake", "freno"), Map.entry("pads", "freno"),
+			Map.entry("timing", "distribuzione"), Map.entry("distribuzione", "distribuzione"),
+			Map.entry("belt", "cinghia"), Map.entry("cinghia", "cinghia"));
 
 	private final int dimensions;
 	private final Map<String, String> synonyms;

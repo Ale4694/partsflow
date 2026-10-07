@@ -1,6 +1,6 @@
 package io.github.ale4694.partsflow.ai.assistant;
 
-import io.github.ale4694.partsflow.ai.matching.ItemCandidateRepository;
+import io.github.ale4694.partsflow.ai.search.ItemSearchService;
 import io.github.ale4694.partsflow.catalog.Item;
 import io.github.ale4694.partsflow.catalog.ItemRepository;
 import io.github.ale4694.partsflow.inventory.InventoryService;
@@ -28,15 +28,15 @@ public class InventoryAssistantTools {
 
 	private final InventoryService inventory;
 	private final ItemRepository items;
-	private final ItemCandidateRepository candidates;
+	private final ItemSearchService search;
 	private final int maxCalls;
 	private int calls;
 
 	public InventoryAssistantTools(InventoryService inventory, ItemRepository items,
-			ItemCandidateRepository candidates, int maxCalls) {
+			ItemSearchService search, int maxCalls) {
 		this.inventory = inventory;
 		this.items = items;
-		this.candidates = candidates;
+		this.search = search;
 		this.maxCalls = maxCalls;
 	}
 
@@ -68,13 +68,14 @@ public class InventoryAssistantTools {
 			BigDecimal reorderThreshold, boolean belowReorderThreshold) {
 	}
 
-	@Tool(description = "Find catalog items by (part of) a description, e.g. 'brake pads'. Returns up to 5 items with their codes.")
+	@Tool(description = "Find catalog items by (part of) a description, e.g. 'brake pads' or 'filtro olio Fiat Panda'. Searches by meaning as well as by words. Returns up to 5 items with their codes.")
 	public Object searchItems(@ToolParam(description = "Words from the item description") String text) {
 		if (!allowed()) {
 			return LIMIT_REACHED;
 		}
-		List<ItemFound> found = candidates.findSimilar(text, 0.1, 5).stream()
-				.map(c -> new ItemFound(c.getCode(), c.getDescription(), c.getUnit()))
+		// hybrid search: finds items by meaning ("filtro olio" finds a "cartuccia lubrificante") and by spelling
+		List<ItemFound> found = search.search(text, 5, true).results().stream()
+				.map(hit -> new ItemFound(hit.code(), hit.description(), hit.unit()))
 				.toList();
 		return found.isEmpty() ? "No similar item found." : found;
 	}

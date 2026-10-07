@@ -11,8 +11,6 @@ public record AiProperties(
 		@DefaultValue("5") int maxAgentSteps,
 		/** Candidate items given to the LLM when matching one invoice line. */
 		@DefaultValue("5") int maxMatchCandidates,
-		/** Candidates with a lower pg_trgm similarity (0 to 1) are not shown to the LLM. */
-		@DefaultValue("0.1") double minSimilarity,
 		/** Most pending lines the LLM is asked about in one request (free-tier friendly). */
 		@DefaultValue("10") int maxLinesPerMatchRequest,
 		/** PDF text longer than this is rejected instead of being sent to the LLM. */

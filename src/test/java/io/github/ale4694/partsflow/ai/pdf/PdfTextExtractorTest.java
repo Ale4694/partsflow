@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 class PdfTextExtractorTest {
 
 	private PdfTextExtractor extractor(int maxChars) {
-		return new PdfTextExtractor(new AiProperties(5, 5, 0.1, 10, maxChars,
+		return new PdfTextExtractor(new AiProperties(5, 5, 10, maxChars,
 				new AiProperties.Retry(3, Duration.ofMillis(1), 2.0, Duration.ofSeconds(5)),
 				AiProperties.Provider.GEMINI, "a-test-key", "", ""));
 	}

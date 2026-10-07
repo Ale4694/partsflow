@@ -55,7 +55,7 @@ public class EmbeddingGateway {
 
 	/** True when a key and an embedding model are configured. Incomplete settings mean text search only. */
 	public boolean isConfigured() {
-		return ai.configured() && !modelName().isBlank() && model.getIfAvailable() != null;
+		return properties.enabled() && ai.configured() && !modelName().isBlank() && model.getIfAvailable() != null;
 	}
 
 	/** Embeds catalog texts (to be searched). One request per {@code batchSize} texts. */

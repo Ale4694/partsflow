@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import io.github.ale4694.partsflow.ai.AiIntegrationTestBase;
+import io.github.ale4694.partsflow.ai.search.ItemSearchService;
 import io.github.ale4694.partsflow.catalog.Item;
 import io.github.ale4694.partsflow.catalog.Supplier;
 import io.github.ale4694.partsflow.invoiceimport.DraftResponse;
@@ -36,7 +37,7 @@ class ItemMatchingIntegrationTest extends AiIntegrationTestBase {
 	@Autowired
 	ImportService importService;
 	@Autowired
-	ItemCandidateRepository candidateRepository;
+	ItemSearchService itemSearch;
 	@Autowired
 	LineMatchSuggestionRepository suggestionRepository;
 
@@ -70,13 +71,13 @@ class ItemMatchingIntegrationTest extends AiIntegrationTestBase {
 		Item timing = newItem("TRG-TB-" + n, "Timing belt kit");
 		newItem("TRG-OIL-" + n, "Engine oil 5W-30, 5 litre can");
 
-		var found = candidateRepository.findSimilar("Timing belt kit 1.6", 0.1, 5);
+		var found = itemSearch.search("Timing belt kit 1.6", 5, false).results();
 
 		assertThat(found).isNotEmpty();
-		assertThat(found.getFirst().getDescription()).startsWith("Timing belt kit");
-		assertThat(found).extracting(ItemCandidate::getId).contains(timing.getId());
-		assertThat(found.getFirst().getScore()).isGreaterThan(0.5f);
-		assertThat(candidateRepository.findSimilar("zzqqxx", 0.1, 5)).isEmpty();
+		assertThat(found.getFirst().description()).startsWith("Timing belt kit");
+		assertThat(found).extracting(ItemSearchService.Hit::itemId).contains(timing.getId());
+		assertThat(found.getFirst().score()).isGreaterThan(0.5);
+		assertThat(itemSearch.search("zzqqxx", 5, false).results()).isEmpty();
 	}
 
 	@Test
@@ -129,10 +130,10 @@ class ItemMatchingIntegrationTest extends AiIntegrationTestBase {
 		int n = next();
 		Supplier supplier = newSupplier(n);
 		// the catalog is shared with other tests, so make sure the first pending line has nothing similar
-		var description = candidateRepository.findSimilar("Timing belt kit", 0.1, 5);
+		var description = itemSearch.search("Timing belt kit", 5, false).results();
 		if (!description.isEmpty()) {
 			// other tests created similar items: this scenario is covered by the repository assertion instead
-			assertThat(candidateRepository.findSimilar("qqzzxxww", 0.1, 5)).isEmpty();
+			assertThat(itemSearch.search("qqzzxxww", 5, false).results()).isEmpty();
 			return;
 		}
 		DraftResponse draft = draftFromFixture(supplier);

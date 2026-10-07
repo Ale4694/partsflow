@@ -28,6 +28,8 @@ import org.springframework.test.web.servlet.MockMvc;
 @TestPropertySource(properties = {
 		"spring.ai.google.genai.api-key=test-key-not-real",
 		"partsflow.ai.api-key=test-key-not-real",
+		// these tests are about the LLM and the spelling search; the embedding side has its own tests
+		"partsflow.embeddings.enabled=false",
 		"partsflow.ai.max-lines-per-match-request=1"
 })
 public abstract class AiIntegrationTestBase {

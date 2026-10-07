@@ -2,6 +2,9 @@ package io.github.ale4694.partsflow.ai.matching;
 
 import io.github.ale4694.partsflow.ai.AiProperties;
 import io.github.ale4694.partsflow.ai.LlmGateway;
+import io.github.ale4694.partsflow.ai.search.ItemSearchService;
+import io.github.ale4694.partsflow.ai.search.ItemSearchService.Hit;
+import io.github.ale4694.partsflow.ai.search.ItemSearchService.SearchResult;
 import io.github.ale4694.partsflow.catalog.Item;
 import io.github.ale4694.partsflow.catalog.ItemRepository;
 import io.github.ale4694.partsflow.common.ConflictException;
@@ -11,6 +14,7 @@ import io.github.ale4694.partsflow.invoiceimport.DraftResponse;
 import io.github.ale4694.partsflow.invoiceimport.ImportService;
 import io.github.ale4694.partsflow.invoiceimport.draft.LineStatus;
 import java.time.Clock;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,8 +26,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Helps with pending draft lines (unknown supplier code): pg_trgm finds a few similar catalog items, the LLM picks
- * the right one or none, and the answer is stored as a suggestion. A person accepts or rejects it; accepting goes
+ * Helps with pending draft lines (unknown supplier code), in the classic RAG shape: RETRIEVE a few candidate
+ * catalog items with the hybrid search (meaning and spelling, see {@link ItemSearchService}), then ask the LLM to
+ * pick the right one or none from only those candidates, and store the answer as a suggestion. A person accepts or rejects it; accepting goes
  * through the normal "resolve line" path, which also remembers the supplier code for next time.
  */
 @Service
@@ -41,18 +46,18 @@ public class ItemMatchingService {
 			Answer with the JSON only: itemId (a candidate id or null) and a short justification.""";
 
 	private final ImportService importService;
-	private final ItemCandidateRepository candidates;
+	private final ItemSearchService search;
 	private final LineMatchSuggestionRepository suggestions;
 	private final ItemRepository items;
 	private final LlmGateway gateway;
 	private final AiProperties properties;
 	private final Clock clock;
 
-	public ItemMatchingService(ImportService importService, ItemCandidateRepository candidates,
+	public ItemMatchingService(ImportService importService, ItemSearchService search,
 			LineMatchSuggestionRepository suggestions, ItemRepository items, LlmGateway gateway,
 			AiProperties properties, Clock clock) {
 		this.importService = importService;
-		this.candidates = candidates;
+		this.search = search;
 		this.suggestions = suggestions;
 		this.items = items;
 		this.gateway = gateway;
@@ -80,27 +85,34 @@ public class ItemMatchingService {
 				.toList();
 
 		List<DraftLineResponse> batch = todo.stream().limit(properties.maxLinesPerMatchRequest()).toList();
-		List<SuggestionResponse> produced = batch.stream()
-				.map(line -> suggestFor(draftId, line, existing.get(line.id())))
-				.toList();
+		// RETRIEVE: the descriptions of all lines of this batch are searched together, which costs ONE embedding
+		// request in total (not one per line); lines without a description search nothing
+		List<SearchResult> retrieved = search.searchAll(batch.stream().map(DraftLineResponse::description).toList(),
+				properties.maxMatchCandidates(), true);
+		List<SuggestionResponse> produced = new ArrayList<>();
+		for (int i = 0; i < batch.size(); i++) {
+			DraftLineResponse line = batch.get(i);
+			produced.add(suggestFor(draftId, line, existing.get(line.id()), retrieved.get(i).results()));
+		}
 		return new MatchRunResponse(produced, todo.size() - batch.size());
 	}
 
-	private SuggestionResponse suggestFor(Long draftId, DraftLineResponse line, LineMatchSuggestion previous) {
-		List<ItemCandidate> found = candidates.findSimilar(line.description(), properties.minSimilarity(),
-				properties.maxMatchCandidates());
+	/** GENERATE: the LLM chooses among the retrieved candidates (and only those). */
+	private SuggestionResponse suggestFor(Long draftId, DraftLineResponse line, LineMatchSuggestion previous,
+			List<Hit> found) {
 
 		Long itemId = null;
 		String justification;
 		if (found.isEmpty()) {
-			// Nothing similar in the catalog: no point spending an LLM call (free-tier quota is small)
+			// Nothing retrieved (empty catalog, or nothing similar by spelling when embeddings are off): no point
+			// spending an LLM call (free-tier quota is small)
 			justification = "No catalog item is similar to this line.";
 		}
 		else {
 			MatchDecision decision = gateway.structured("item-matching", SYSTEM_PROMPT, prompt(line, found),
 					MatchDecision.class);
 			boolean knownCandidate = decision != null && decision.itemId() != null
-					&& found.stream().anyMatch(c -> c.getId().equals(decision.itemId()));
+					&& found.stream().anyMatch(c -> c.itemId() == decision.itemId());
 			if (decision != null && decision.itemId() != null && !knownCandidate) {
 				// The model must choose among the candidates we showed it; anything else is ignored
 				log.warn("LLM proposed item {} which is not among the candidates of line {}", decision.itemId(),
@@ -117,15 +129,15 @@ public class ItemMatchingService {
 		return toResponse(save(draftId, line.id(), itemId, justification, previous));
 	}
 
-	private String prompt(DraftLineResponse line, List<ItemCandidate> found) {
+	private String prompt(DraftLineResponse line, List<Hit> found) {
 		StringBuilder prompt = new StringBuilder("Document line:\n<<<\n")
 				.append("description: ").append(line.description()).append('\n')
 				.append("supplier code: ").append(line.supplierCode() == null ? "none" : line.supplierCode()).append('\n')
 				.append("unit: ").append(line.unit() == null ? "unknown" : line.unit()).append('\n')
 				.append(">>>\n\nCandidate catalog items:\n");
-		for (ItemCandidate candidate : found) {
-			prompt.append("- id ").append(candidate.getId()).append(" | code ").append(candidate.getCode())
-					.append(" | ").append(candidate.getDescription()).append(" | unit ").append(candidate.getUnit())
+		for (Hit candidate : found) {
+			prompt.append("- id ").append(candidate.itemId()).append(" | code ").append(candidate.code())
+					.append(" | ").append(candidate.description()).append(" | unit ").append(candidate.unit())
 					.append('\n');
 		}
 		return prompt.toString();

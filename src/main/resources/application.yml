@@ -59,6 +59,7 @@ management:
 partsflow:
   embeddings:
     # Semantic search (embeddings). Same provider and key as the chat model; see README, "Semantic search".
+    enabled: ${LLM_EMBEDDINGS_ENABLED:true}
     model: ${LLM_EMBEDDING_MODEL:}
     dimensions: ${LLM_EMBEDDING_DIMENSIONS:768}
   ai:

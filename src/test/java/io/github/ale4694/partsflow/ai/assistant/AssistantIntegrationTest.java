@@ -10,7 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import io.github.ale4694.partsflow.ai.AiIntegrationTestBase;
-import io.github.ale4694.partsflow.ai.matching.ItemCandidateRepository;
+import io.github.ale4694.partsflow.ai.search.ItemSearchService;
 import io.github.ale4694.partsflow.catalog.Item;
 import io.github.ale4694.partsflow.inventory.InventoryService;
 import io.github.ale4694.partsflow.inventory.MovementType;
@@ -29,10 +29,10 @@ class AssistantIntegrationTest extends AiIntegrationTestBase {
 	@Autowired
 	InventoryService inventory;
 	@Autowired
-	ItemCandidateRepository candidates;
+	ItemSearchService search;
 
 	private InventoryAssistantTools tools(int maxCalls) {
-		return new InventoryAssistantTools(inventory, items, candidates, maxCalls);
+		return new InventoryAssistantTools(inventory, items, search, maxCalls);
 	}
 
 	private Item itemWithStock(String quantity, String threshold) {

@@ -2,7 +2,7 @@ package io.github.ale4694.partsflow.ai.assistant;
 
 import io.github.ale4694.partsflow.ai.AiProperties;
 import io.github.ale4694.partsflow.ai.LlmGateway;
-import io.github.ale4694.partsflow.ai.matching.ItemCandidateRepository;
+import io.github.ale4694.partsflow.ai.search.ItemSearchService;
 import io.github.ale4694.partsflow.catalog.ItemRepository;
 import io.github.ale4694.partsflow.inventory.InventoryService;
 import org.springframework.stereotype.Service;
@@ -27,22 +27,22 @@ public class AssistantService {
 	private final LlmGateway gateway;
 	private final InventoryService inventory;
 	private final ItemRepository items;
-	private final ItemCandidateRepository candidates;
+	private final ItemSearchService search;
 	private final AiProperties properties;
 
 	public AssistantService(LlmGateway gateway, InventoryService inventory, ItemRepository items,
-			ItemCandidateRepository candidates, AiProperties properties) {
+			ItemSearchService search, AiProperties properties) {
 		this.gateway = gateway;
 		this.inventory = inventory;
 		this.items = items;
-		this.candidates = candidates;
+		this.search = search;
 		this.properties = properties;
 	}
 
 	public AssistantResponse ask(String question) {
 		gateway.requireConfigured();
 		// A fresh tool object per question: it carries this question's call budget
-		InventoryAssistantTools tools = new InventoryAssistantTools(inventory, items, candidates,
+		InventoryAssistantTools tools = new InventoryAssistantTools(inventory, items, search,
 				properties.maxAgentSteps());
 		String answer = gateway.converse("inventory-assistant", SYSTEM_PROMPT, question, tools);
 		return new AssistantResponse(answer, Math.min(tools.calls(), properties.maxAgentSteps()));

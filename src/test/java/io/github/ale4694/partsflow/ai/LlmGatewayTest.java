@@ -39,7 +39,7 @@ class LlmGatewayTest {
 	private static final AiProperties.Retry RETRY = new AiProperties.Retry(3, Duration.ofMillis(1), 2.0,
 			Duration.ofSeconds(5));
 
-	private static final AiProperties PROPERTIES = new AiProperties(5, 5, 0.1, 10, 30000, RETRY,
+	private static final AiProperties PROPERTIES = new AiProperties(5, 5, 10, 30000, RETRY,
 			AiProperties.Provider.GEMINI, "a-test-key", "", "");
 
 	private ChatModel model;
@@ -82,7 +82,7 @@ class LlmGatewayTest {
 
 	@Test
 	void withoutApiKeyTheModelIsNeverCalled() {
-		AiProperties noKey = new AiProperties(5, 5, 0.1, 10, 30000, RETRY, AiProperties.Provider.GEMINI, "", "", "");
+		AiProperties noKey = new AiProperties(5, 5, 10, 30000, RETRY, AiProperties.Provider.GEMINI, "", "", "");
 		LlmGateway disabled = new LlmGateway(ChatClient.builder(model).build(), noKey,
 				new ProviderCallPolicy(noKey, new GeminiErrorTranslator()));
 
