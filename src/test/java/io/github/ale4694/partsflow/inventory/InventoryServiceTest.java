@@ -9,6 +9,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import io.github.ale4694.partsflow.catalog.Item;
 import io.github.ale4694.partsflow.catalog.ItemRepository;
 import io.github.ale4694.partsflow.common.ConflictException;
 import io.github.ale4694.partsflow.common.ResourceNotFoundException;
@@ -52,7 +53,7 @@ class InventoryServiceTest {
 	}
 
 	private void itemExists() {
-		when(items.existsById(1L)).thenReturn(true);
+		when(items.findById(1L)).thenReturn(Optional.of(new Item("BRK-001", "Brake pads", "PZ", BigDecimal.ZERO)));
 		// lenient: tests that fail before saving the movement never call it
 		lenient().when(movements.save(any(StockMovement.class))).thenAnswer(inv -> inv.getArgument(0));
 	}
@@ -65,6 +66,7 @@ class InventoryServiceTest {
 		StockMovementResponse response = service.record(request(MovementType.IN, "10"));
 
 		assertThat(response.type()).isEqualTo(MovementType.IN);
+		assertThat(response.itemCode()).isEqualTo("BRK-001");
 		assertThat(response.createdAt()).isEqualTo(Instant.parse("2026-01-15T10:00:00Z"));
 		verify(stocks).save(any(Stock.class));
 	}
@@ -83,7 +85,7 @@ class InventoryServiceTest {
 
 	@Test
 	void outMovementBeyondStockIsRejectedAndNothingIsSaved() {
-		when(items.existsById(1L)).thenReturn(true);
+		itemExists();
 		Stock stock = new Stock(1L);
 		stock.add(new BigDecimal("3"));
 		when(stocks.findById(1L)).thenReturn(Optional.of(stock));
@@ -109,7 +111,7 @@ class InventoryServiceTest {
 
 	@Test
 	void unknownItemIsNotFound() {
-		when(items.existsById(1L)).thenReturn(false);
+		when(items.findById(1L)).thenReturn(Optional.empty());
 
 		assertThatThrownBy(() -> service.record(request(MovementType.IN, "1")))
 				.isInstanceOf(ResourceNotFoundException.class);

@@ -1,7 +1,6 @@
 package io.github.ale4694.partsflow.common;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -40,6 +39,7 @@ class InvalidSortIntegrationTest {
 		List<String> urls = List.of(
 				"/api/suppliers",
 				"/api/items",
+				"/api/items?q=a",
 				"/api/suppliers/" + supplierId + "/item-codes",
 				"/api/inventory/movements",
 				"/api/inventory/movements?itemId=" + itemId,
@@ -65,9 +65,9 @@ class InvalidSortIntegrationTest {
 	}
 
 	@Test
-	void lowStockIgnoresSortByDesign() throws Exception {
-		assertThat(mvc.perform(get("/api/inventory/low-stock?sort=string")).andReturn().getResponse().getStatus())
-				.isEqualTo(200);
+	void overviewEndpointsWithAFixedOrderIgnoreSortByDesign() throws Exception {
+		mvc.perform(get("/api/inventory/low-stock?sort=string")).andExpect(status().isOk());
+		mvc.perform(get("/api/inventory/stock?sort=string")).andExpect(status().isOk());
 	}
 
 	private long createAndReturnId(String url, String json) throws Exception {

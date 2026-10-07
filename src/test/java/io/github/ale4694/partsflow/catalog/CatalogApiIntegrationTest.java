@@ -84,6 +84,24 @@ class CatalogApiIntegrationTest {
 				.andExpect(jsonPath("$.size").value(2));
 	}
 
+	@Test
+	void itemsCanBeSearchedByCodeOrDescription() throws Exception {
+		createAndReturnId("/api/items", """
+				{"code": "SRCH-ALPHA", "description": "Timing belt kit", "unit": "PZ", "reorderThreshold": 0}""");
+		createAndReturnId("/api/items", """
+				{"code": "SRCH-BETA", "description": "Wiper blade 600mm", "unit": "PZ", "reorderThreshold": 0}""");
+
+		mvc.perform(get("/api/items?q=alpha"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.totalElements").value(1))
+				.andExpect(jsonPath("$.content[0].code").value("SRCH-ALPHA"));
+		mvc.perform(get("/api/items?q=WIPER"))
+				.andExpect(jsonPath("$.totalElements").value(1))
+				.andExpect(jsonPath("$.content[0].code").value("SRCH-BETA"));
+		mvc.perform(get("/api/items?q=nothing-like-this"))
+				.andExpect(jsonPath("$.totalElements").value(0));
+	}
+
 	private long createAndReturnId(String url, String body) throws Exception {
 		MvcResult result = mvc.perform(post(url).contentType(MediaType.APPLICATION_JSON).content(body))
 				.andExpect(status().isCreated())

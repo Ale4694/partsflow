@@ -31,8 +31,13 @@ public class ItemService {
 	}
 
 	@Transactional(readOnly = true)
-	public PageResponse<ItemResponse> list(Pageable pageable) {
-		return PageResponse.from(items.findAll(pageable).map(ItemResponse::from));
+	public PageResponse<ItemResponse> list(String search, Pageable pageable) {
+		if (search == null || search.isBlank()) {
+			return PageResponse.from(items.findAll(pageable).map(ItemResponse::from));
+		}
+		String text = search.trim();
+		return PageResponse.from(items.findByCodeContainingIgnoreCaseOrDescriptionContainingIgnoreCase(text, text,
+				pageable).map(ItemResponse::from));
 	}
 
 	public ItemResponse update(Long id, ItemRequest request) {

@@ -11,6 +11,7 @@ import io.github.ale4694.partsflow.catalog.Item;
 import io.github.ale4694.partsflow.catalog.ItemRepository;
 import java.math.BigDecimal;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -67,7 +68,8 @@ class InventoryIntegrationTest {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.totalElements").value(2))
 				.andExpect(jsonPath("$.content[0].type").value("OUT"))
-				.andExpect(jsonPath("$.content[0].sourceDocument").value("test-doc"));
+				.andExpect(jsonPath("$.content[0].sourceDocument").value("test-doc"))
+				.andExpect(jsonPath("$.content[0].itemCode").value(item.getCode()));
 	}
 
 	@Test
@@ -103,6 +105,25 @@ class InventoryIntegrationTest {
 				.andReturn().getResponse().getContentAsString();
 
 		assertThat(body).contains(untouched.getCode());
+	}
+
+	@Test
+	void stockOverviewListsEveryItemWithItsCurrentStock() throws Exception {
+		Item withStock = newItem("5");
+		Item untouched = newItem("2");
+		move(withStock, "IN", "7.5", 201);
+
+		String body = mvc.perform(get("/api/inventory/stock?size=100"))
+				.andExpect(status().isOk())
+				.andReturn().getResponse().getContentAsString();
+
+		assertThat(body).contains("\"itemCode\":\"" + withStock.getCode() + "\"")
+				.contains("\"itemCode\":\"" + untouched.getCode() + "\"");
+		mvc.perform(get("/api/inventory/stock?size=100"))
+				.andExpect(jsonPath("$.content[?(@.itemCode == '" + withStock.getCode() + "')].quantity")
+						.value(Matchers.contains(7.5)))
+				.andExpect(jsonPath("$.content[?(@.itemCode == '" + untouched.getCode() + "')].quantity")
+						.value(Matchers.contains(0)));
 	}
 
 	@Test

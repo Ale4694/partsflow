@@ -8,7 +8,10 @@ import io.github.ale4694.partsflow.common.RetryingTransaction;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -55,9 +58,8 @@ public class InventoryService {
 	}
 
 	private StockMovementResponse apply(StockMovementRequest request) {
-		if (!items.existsById(request.itemId())) {
-			throw new ResourceNotFoundException("Item", request.itemId());
-		}
+		Item item = items.findById(request.itemId())
+				.orElseThrow(() -> new ResourceNotFoundException("Item", request.itemId()));
 		Stock stock = stocks.findById(request.itemId()).orElseGet(() -> new Stock(request.itemId()));
 		switch (request.type()) {
 			case IN -> stock.add(request.quantity());
@@ -71,7 +73,7 @@ public class InventoryService {
 		stocks.save(stock);
 		StockMovement movement = new StockMovement(request.itemId(), request.type(), request.quantity(),
 				request.reason(), request.sourceDocument(), Instant.now(clock));
-		return StockMovementResponse.from(movements.save(movement));
+		return StockMovementResponse.from(movements.save(movement), item.getCode());
 	}
 
 	@Transactional(readOnly = true)
@@ -83,13 +85,29 @@ public class InventoryService {
 
 	@Transactional(readOnly = true)
 	public PageResponse<StockMovementResponse> listMovements(Long itemId, Pageable pageable) {
+		Page<StockMovement> page;
 		if (itemId == null) {
-			return PageResponse.from(movements.findAll(pageable).map(StockMovementResponse::from));
+			page = movements.findAll(pageable);
 		}
-		if (!items.existsById(itemId)) {
-			throw new ResourceNotFoundException("Item", itemId);
+		else {
+			if (!items.existsById(itemId)) {
+				throw new ResourceNotFoundException("Item", itemId);
+			}
+			page = movements.findByItemId(itemId, pageable);
 		}
-		return PageResponse.from(movements.findByItemId(itemId, pageable).map(StockMovementResponse::from));
+		// One query for all item codes of this page, instead of one per movement
+		Map<Long, String> codes = new HashMap<>();
+		items.findAllById(page.getContent().stream().map(StockMovement::getItemId).distinct().toList())
+				.forEach(item -> codes.put(item.getId(), item.getCode()));
+		return PageResponse.from(page.map(m -> StockMovementResponse.from(m, codes.get(m.getItemId()))));
+	}
+
+	/** Every item with its current stock (0 when it never had a movement), ordered by item code. */
+	@Transactional(readOnly = true)
+	public PageResponse<StockLevel> listStock(Pageable pageable) {
+		// Ordering is fixed in the query (by item code); a client-supplied sort is ignored
+		Pageable unsorted = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
+		return PageResponse.from(stocks.findStockLevels(unsorted));
 	}
 
 	@Transactional(readOnly = true)

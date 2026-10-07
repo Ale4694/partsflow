@@ -44,6 +44,12 @@ public class InventoryController {
 		return service.getStock(itemId);
 	}
 
+	/** Every item with its current stock, ordered by item code (a client-supplied sort is ignored). */
+	@GetMapping("/stock")
+	PageResponse<StockLevel> stockLevels(@ParameterObject @PageableDefault(size = 20) Pageable pageable) {
+		return service.listStock(pageable);
+	}
+
 	@GetMapping("/low-stock")
 	PageResponse<LowStockItem> lowStock(@ParameterObject @PageableDefault(size = 20) Pageable pageable) {
 		return service.listLowStock(pageable);

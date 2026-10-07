@@ -10,12 +10,16 @@ import static org.mockito.Mockito.when;
 import io.github.ale4694.partsflow.common.ConflictException;
 import io.github.ale4694.partsflow.common.ResourceNotFoundException;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 class ItemServiceTest {
@@ -60,5 +64,24 @@ class ItemServiceTest {
 		when(items.existsByCodeAndIdNot("BRK-001", 1L)).thenReturn(true);
 
 		assertThatThrownBy(() -> service.update(1L, request)).isInstanceOf(ConflictException.class);
+	}
+
+	@Test
+	void listWithoutSearchTextReturnsAllItems() {
+		Pageable pageable = PageRequest.of(0, 20);
+		when(items.findAll(pageable)).thenReturn(new PageImpl<>(
+				List.of(new Item("BRK-001", "Front brake pad set", "PZ", BigDecimal.ONE))));
+
+		assertThat(service.list("  ", pageable).content()).extracting(ItemResponse::code).containsExactly("BRK-001");
+		verify(items, never()).findByCodeContainingIgnoreCaseOrDescriptionContainingIgnoreCase(any(), any(), any());
+	}
+
+	@Test
+	void listWithSearchTextSearchesCodeAndDescription() {
+		Pageable pageable = PageRequest.of(0, 20);
+		when(items.findByCodeContainingIgnoreCaseOrDescriptionContainingIgnoreCase("brake", "brake", pageable))
+				.thenReturn(new PageImpl<>(List.of(new Item("BRK-001", "Front brake pad set", "PZ", BigDecimal.ONE))));
+
+		assertThat(service.list(" brake ", pageable).content()).hasSize(1);
 	}
 }

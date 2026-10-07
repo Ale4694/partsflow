@@ -20,4 +20,14 @@ public interface StockRepository extends JpaRepository<Stock, Long> {
 					where coalesce(s.quantity, 0) < i.reorderThreshold
 					""")
 	Page<LowStockItem> findLowStock(Pageable pageable);
+
+	/** All items with their current stock. Items without a stock row count as quantity 0. */
+	@Query(value = """
+			select new io.github.ale4694.partsflow.inventory.StockLevel(
+			    i.id, i.code, i.description, i.unit, coalesce(s.quantity, 0), i.reorderThreshold)
+			from Item i left join Stock s on s.itemId = i.id
+			order by i.code
+			""",
+			countQuery = "select count(i) from Item i")
+	Page<StockLevel> findStockLevels(Pageable pageable);
 }

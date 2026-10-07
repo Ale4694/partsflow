@@ -1,6 +1,7 @@
 package io.github.ale4694.partsflow.catalog;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -10,7 +11,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import io.github.ale4694.partsflow.common.ApiExceptionHandler;
 import io.github.ale4694.partsflow.common.ResourceNotFoundException;
+import io.github.ale4694.partsflow.common.PageResponse;
 import java.math.BigDecimal;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -54,5 +57,15 @@ class ItemControllerTest {
 		when(service.get(3L)).thenThrow(new ResourceNotFoundException("Item", 3L));
 
 		mvc.perform(get("/api/items/3")).andExpect(status().isNotFound());
+	}
+
+	@Test
+	void listPassesTheSearchTextToTheService() throws Exception {
+		when(service.list(eq("brake"), any())).thenReturn(new PageResponse<>(
+				List.of(new ItemResponse(1L, "BRK-001", "Front brake pad set", "PZ", new BigDecimal("5"))), 0, 20, 1, 1));
+
+		mvc.perform(get("/api/items?q=brake"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.content[0].code").value("BRK-001"));
 	}
 }
