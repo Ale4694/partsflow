@@ -9,6 +9,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.retry.RetryPolicy;
 import org.springframework.core.retry.RetryTemplate;
 
+/**
+ * The Client and RetryTemplate beans are static: the Spring AI auto-configuration needs them very early, while
+ * the context is still being set up. A non-static @Bean method would force Spring to create this class too
+ * early ("Cannot enhance @Configuration bean definition 'aiConfig'" warning at startup).
+ */
 @Configuration
 @EnableConfigurationProperties(AiProperties.class)
 class AiConfig {
@@ -19,7 +24,7 @@ class AiConfig {
 	 * real key is configured, so the placeholder is never sent anywhere.
 	 */
 	@Bean
-	Client googleGenAiClient(@Value("${spring.ai.google.genai.api-key:}") String apiKey) {
+	static Client googleGenAiClient(@Value("${spring.ai.google.genai.api-key:}") String apiKey) {
 		return Client.builder().apiKey(apiKey.isBlank() ? "not-configured" : apiKey).build();
 	}
 
@@ -28,7 +33,7 @@ class AiConfig {
 	 * (short, bounded, then a clear 503), so the built-in retry is switched off.
 	 */
 	@Bean
-	RetryTemplate aiRetryTemplate() {
+	static RetryTemplate aiRetryTemplate() {
 		return new RetryTemplate(RetryPolicy.withMaxRetries(0));
 	}
 
