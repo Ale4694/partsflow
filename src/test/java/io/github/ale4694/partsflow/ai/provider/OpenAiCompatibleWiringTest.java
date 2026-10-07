@@ -43,4 +43,15 @@ class OpenAiCompatibleWiringTest {
 		assertThat(context.getBeansOfType(Client.class)).isEmpty();
 		assertThat(gateway.isConfigured()).isTrue();
 	}
+
+	@Test
+	void createsTheOpenAiEmbeddingModelAndOptionsAndNotTheGeminiOne() {
+		java.util.Set<String> classes = context.getBeansOfType(org.springframework.ai.embedding.EmbeddingModel.class)
+				.values().stream().map(bean -> bean.getClass().getSimpleName())
+				.collect(java.util.stream.Collectors.toSet());
+
+		assertThat(classes).contains("OpenAiEmbeddingModel").doesNotContain("GoogleGenAiTextEmbeddingModel");
+		assertThat(context.getBeansOfType(EmbeddingOptionsFactory.class).values())
+				.singleElement().isInstanceOf(OpenAiEmbeddingOptionsFactory.class);
+	}
 }

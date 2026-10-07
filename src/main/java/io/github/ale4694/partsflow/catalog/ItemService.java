@@ -3,6 +3,7 @@ package io.github.ale4694.partsflow.catalog;
 import io.github.ale4694.partsflow.common.ConflictException;
 import io.github.ale4694.partsflow.common.PageResponse;
 import io.github.ale4694.partsflow.common.ResourceNotFoundException;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,9 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class ItemService {
 
 	private final ItemRepository items;
+	private final ApplicationEventPublisher events;
 
-	public ItemService(ItemRepository items) {
+	public ItemService(ItemRepository items, ApplicationEventPublisher events) {
 		this.items = items;
+		this.events = events;
 	}
 
 	public ItemResponse create(ItemRequest request) {
@@ -22,7 +25,9 @@ public class ItemService {
 			throw new ConflictException("Esiste già un articolo con codice " + request.code());
 		}
 		Item item = new Item(request.code(), request.description(), request.unit(), request.reorderThreshold());
-		return ItemResponse.from(items.save(item));
+		Item saved = items.save(item);
+		events.publishEvent(ItemChanged.of(saved.getId()));
+		return ItemResponse.from(saved);
 	}
 
 	@Transactional(readOnly = true)
@@ -46,6 +51,7 @@ public class ItemService {
 			throw new ConflictException("Esiste già un articolo con codice " + request.code());
 		}
 		item.update(request.code(), request.description(), request.unit(), request.reorderThreshold());
+		events.publishEvent(ItemChanged.of(item.getId()));
 		return ItemResponse.from(item);
 	}
 

@@ -1,6 +1,7 @@
 package io.github.ale4694.partsflow.invoiceimport;
 
 import io.github.ale4694.partsflow.catalog.Item;
+import io.github.ale4694.partsflow.catalog.ItemChanged;
 import io.github.ale4694.partsflow.catalog.ItemRepository;
 import io.github.ale4694.partsflow.catalog.Supplier;
 import io.github.ale4694.partsflow.catalog.SupplierItemCode;
@@ -34,6 +35,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -58,10 +60,11 @@ public class ImportService {
 	private final InventoryService inventory;
 	private final RetryingTransaction retrying;
 	private final Clock clock;
+	private final ApplicationEventPublisher events;
 
 	public ImportService(FatturaPaParser parser, SupplierRepository suppliers, SupplierItemCodeRepository mappings,
 			ItemRepository items, ImportDraftRepository drafts, InventoryService inventory,
-			RetryingTransaction retrying, Clock clock) {
+			RetryingTransaction retrying, Clock clock, ApplicationEventPublisher events) {
 		this.parser = parser;
 		this.suppliers = suppliers;
 		this.mappings = mappings;
@@ -70,6 +73,7 @@ public class ImportService {
 		this.inventory = inventory;
 		this.retrying = retrying;
 		this.clock = clock;
+		this.events = events;
 	}
 
 	@Transactional
@@ -244,6 +248,8 @@ public class ImportService {
 	private void saveMappingIfNew(Supplier supplier, String supplierCode, Item item) {
 		if (supplierCode != null && !mappings.existsBySupplierIdAndSupplierCode(supplier.getId(), supplierCode)) {
 			mappings.save(new SupplierItemCode(supplier, item, supplierCode));
+			// the supplier codes are part of the text the semantic search reads about an item
+			events.publishEvent(ItemChanged.of(item.getId()));
 		}
 	}
 }

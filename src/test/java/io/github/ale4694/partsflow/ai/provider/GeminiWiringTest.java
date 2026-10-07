@@ -36,4 +36,17 @@ class GeminiWiringTest {
 		assertThat(context.getBeansOfType(Client.class)).hasSize(1);
 		assertThat(gateway.isConfigured()).isTrue();
 	}
+
+	@Test
+	void createsTheGeminiEmbeddingModelAndOptionsAndNotTheOpenAiOne() {
+		// the fake test model is also there (it wins by @Primary); what matters is which REAL model exists
+		assertThat(embeddingModelClasses()).contains("GoogleGenAiTextEmbeddingModel").doesNotContain("OpenAiEmbeddingModel");
+		assertThat(context.getBeansOfType(EmbeddingOptionsFactory.class).values())
+				.singleElement().isInstanceOf(GeminiEmbeddingOptionsFactory.class);
+	}
+
+	private java.util.Set<String> embeddingModelClasses() {
+		return context.getBeansOfType(org.springframework.ai.embedding.EmbeddingModel.class).values().stream()
+				.map(bean -> bean.getClass().getSimpleName()).collect(java.util.stream.Collectors.toSet());
+	}
 }
