@@ -72,7 +72,10 @@ nav a.active {
 
 @media (max-width: 800px) {
   .shell {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+    /* The menu bar is as tall as its content; the page takes the rest. Without this, the two rows of the grid
+       shared the free height of a short page and the dark bar grew to half the screen. */
+    grid-template-rows: auto 1fr;
   }
   .sidebar {
     position: static;

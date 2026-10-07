@@ -49,3 +49,20 @@
   flex-direction: column;
   gap: var(--space-1);
 }
+
+/* On a narrow screen the table keeps what is needed to decide on a line (code, description, quantity, total,
+   status, actions); line number, item and stock effect are left out so the action buttons stay visible. */
+@media (max-width: 800px) {
+  .hide-narrow {
+    display: none;
+  }
+
+  .wide {
+    min-width: 5rem;
+  }
+
+  th,
+  td {
+    padding-inline: var(--space-1);
+  }
+}
