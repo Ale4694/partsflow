@@ -25,6 +25,10 @@ export class NotificationService {
   }
 
   private show(kind: Notification['kind'], message: string, milliseconds: number): void {
+    // Several requests can fail for the same reason at once (server down): show that message only once
+    if (this.notifications().some((n) => n.kind === kind && n.message === message)) {
+      return;
+    }
     const id = this.nextId++;
     this.notifications.update((list) => [...list, { id, kind, message }]);
     setTimeout(() => this.dismiss(id), milliseconds);
