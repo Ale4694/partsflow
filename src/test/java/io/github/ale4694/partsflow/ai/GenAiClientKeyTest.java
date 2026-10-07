@@ -16,7 +16,8 @@ import org.springframework.test.context.TestPropertySource;
  */
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
-@TestPropertySource(properties = "spring.ai.google.genai.api-key=fake-key-for-this-test")
+@TestPropertySource(properties = { "spring.ai.google.genai.api-key=fake-key-for-this-test",
+		"partsflow.ai.api-key=fake-key-for-this-test" })
 class GenAiClientKeyTest {
 
 	@Autowired

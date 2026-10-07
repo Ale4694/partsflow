@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.genai.Client;
 import com.google.genai.errors.ApiException;
+import io.github.ale4694.partsflow.ai.provider.GeminiConfiguration;
 import com.sun.net.httpserver.HttpServer;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
@@ -47,7 +48,7 @@ class SdkSingleAttemptTest {
 		String baseUrl = "http://127.0.0.1:" + server.getAddress().getPort();
 		long started = System.nanoTime();
 		try (Client client = Client.builder().apiKey("fake-key")
-				.httpOptions(AiConfig.httpOptions().toBuilder().baseUrl(baseUrl).build()).build()) {
+				.httpOptions(GeminiConfiguration.httpOptions().toBuilder().baseUrl(baseUrl).build()).build()) {
 			assertThatThrownBy(() -> client.models.generateContent("some-model", "hello", null))
 					.isInstanceOf(ApiException.class)
 					.extracting(e -> ((ApiException) e).code()).isEqualTo(429);

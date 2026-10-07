@@ -21,7 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest
 @AutoConfigureMockMvc
 @Import(TestcontainersConfiguration.class)
-@TestPropertySource(properties = "spring.ai.google.genai.api-key=")
+@TestPropertySource(properties = { "spring.ai.google.genai.api-key=", "partsflow.ai.api-key=" })
 class AiDisabledIntegrationTest {
 
 	@Autowired

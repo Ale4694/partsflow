@@ -26,7 +26,11 @@ services:
       DB_PASSWORD: ${POSTGRES_PASSWORD:-partsflow}
       # Passed through from your shell or .env. Empty = the AI endpoints answer 503, everything else works.
       LLM_API_KEY: ${LLM_API_KEY:-}
-      LLM_MODEL: ${LLM_MODEL:-gemini-3.5-flash}
+      # The next three are passed through ONLY when you set them (a "null" value in Compose means "take it from
+      # the host if it is set"). Unset means: Gemini, with its default model. See "Choosing the LLM provider".
+      LLM_PROVIDER:
+      LLM_BASE_URL:
+      LLM_MODEL:
     healthcheck:
       # The image has curl. "UP" only after Flyway ran and the database answers.
       test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]

@@ -17,7 +17,8 @@ import org.junit.jupiter.api.Test;
 class EvalSamplesTest {
 
 	private final PdfTextExtractor extractor = new PdfTextExtractor(
-			new AiProperties(5, 5, 0.1, 10, 30000, new AiProperties.Retry(3, Duration.ofMillis(1), 2.0, Duration.ofSeconds(5))));
+			new AiProperties(5, 5, 0.1, 10, 30000, new AiProperties.Retry(3, Duration.ofMillis(1), 2.0, Duration.ofSeconds(5)),
+					AiProperties.Provider.GEMINI, "a-test-key", "", ""));
 	private final ExtractedDocumentMapper mapper = new ExtractedDocumentMapper();
 
 	@Test

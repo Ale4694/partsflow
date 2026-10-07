@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @Import(TestcontainersConfiguration.class)
 @TestPropertySource(properties = {
 		"spring.ai.google.genai.api-key=test-key-not-real",
+		"partsflow.ai.api-key=test-key-not-real",
 		"partsflow.ai.max-lines-per-match-request=1"
 })
 public abstract class AiIntegrationTestBase {

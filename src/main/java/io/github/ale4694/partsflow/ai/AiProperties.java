@@ -17,7 +17,32 @@ public record AiProperties(
 		@DefaultValue("10") int maxLinesPerMatchRequest,
 		/** PDF text longer than this is rejected instead of being sent to the LLM. */
 		@DefaultValue("30000") int maxPdfTextChars,
-		@DefaultValue Retry retry) {
+		@DefaultValue Retry retry,
+		/** Which LLM service is used (LLM_PROVIDER): gemini or openai-compatible. */
+		@DefaultValue("gemini") Provider provider,
+		/** The API key (LLM_API_KEY). Read only from the environment. */
+		@DefaultValue("") String apiKey,
+		/** Address of the OpenAI-compatible service (LLM_BASE_URL). Not used by Gemini. */
+		@DefaultValue("") String baseUrl,
+		/** Model name (LLM_MODEL). Gemini has a default; an OpenAI-compatible service needs one. */
+		@DefaultValue("") String model) {
+
+	public enum Provider {
+		GEMINI,
+		OPENAI_COMPATIBLE
+	}
+
+	/**
+	 * True when the settings are complete enough to call the LLM. Gemini needs only a key (the model has a
+	 * default); an OpenAI-compatible service also needs its address and a model name. Incomplete settings never
+	 * stop the application from starting: the AI endpoints answer 503 and everything else works.
+	 */
+	public boolean configured() {
+		if (apiKey.isBlank()) {
+			return false;
+		}
+		return provider == Provider.GEMINI || (!baseUrl.isBlank() && !model.isBlank());
+	}
 
 	/** Retry for rate-limit (HTTP 429) and temporary server errors. */
 	public record Retry(

@@ -14,6 +14,7 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.google.genai.errors.ClientException;
+import io.github.ale4694.partsflow.ai.provider.GeminiErrorTranslator;
 import com.google.genai.errors.ServerException;
 import java.time.Duration;
 import java.util.List;
@@ -35,8 +36,11 @@ class LlmGatewayTest {
 	record Answer(String value) {
 	}
 
-	private static final AiProperties PROPERTIES = new AiProperties(5, 5, 0.1, 10, 30000,
-			new AiProperties.Retry(3, Duration.ofMillis(1), 2.0, Duration.ofSeconds(5)));
+	private static final AiProperties.Retry RETRY = new AiProperties.Retry(3, Duration.ofMillis(1), 2.0,
+			Duration.ofSeconds(5));
+
+	private static final AiProperties PROPERTIES = new AiProperties(5, 5, 0.1, 10, 30000, RETRY,
+			AiProperties.Provider.GEMINI, "a-test-key", "", "");
 
 	private ChatModel model;
 	private LlmGateway gateway;
@@ -47,7 +51,7 @@ class LlmGatewayTest {
 	void setUp() {
 		model = mock(ChatModel.class);
 		when(model.getOptions()).thenReturn(ChatOptions.builder().build());
-		gateway = new LlmGateway(ChatClient.builder(model).build(), "a-test-key", PROPERTIES);
+		gateway = new LlmGateway(ChatClient.builder(model).build(), PROPERTIES, new GeminiErrorTranslator());
 		gatewayLogger = (Logger) LoggerFactory.getLogger(LlmGateway.class);
 		logs = new ListAppender<>();
 		logs.start();
@@ -77,7 +81,8 @@ class LlmGatewayTest {
 
 	@Test
 	void withoutApiKeyTheModelIsNeverCalled() {
-		LlmGateway disabled = new LlmGateway(ChatClient.builder(model).build(), "", PROPERTIES);
+		AiProperties noKey = new AiProperties(5, 5, 0.1, 10, 30000, RETRY, AiProperties.Provider.GEMINI, "", "", "");
+		LlmGateway disabled = new LlmGateway(ChatClient.builder(model).build(), noKey, new GeminiErrorTranslator());
 
 		assertThat(disabled.isConfigured()).isFalse();
 		assertThatThrownBy(() -> disabled.structured("test-op", "s", "u", Answer.class))
@@ -195,7 +200,7 @@ class LlmGatewayTest {
 				.isInstanceOfSatisfying(AiUnavailableException.class, e -> {
 					assertThat(e.reason()).isEqualTo(AiUnavailableException.Reason.DAILY_QUOTA_EXHAUSTED);
 					assertThat(e.retryAfter()).isEqualTo(Duration.ofHours(9).plusMinutes(3).plusMillis(1200));
-					assertThat(e.getMessage()).contains("daily quota").contains("about 9 hours");
+					assertThat(e.getMessage()).contains("quota or credit").contains("about 9 hours");
 				});
 		verify(model, times(1)).call(any(Prompt.class));
 	}

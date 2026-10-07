@@ -1,12 +1,24 @@
 spring:
   ai:
+    model:
+      # Which Spring AI chat model starts (both starters are on the classpath, exactly one may run).
+      # The nested placeholder maps LLM_PROVIDER (gemini | openai-compatible) onto Spring AI's names below.
+      chat: ${partsflow.ai.chat-model.${partsflow.ai.provider}:none}
     google:
       genai:
         # The key is read ONLY from the environment. Empty = AI endpoints answer 503, the rest of the app works.
-        api-key: ${LLM_API_KEY:}
+        api-key: ${partsflow.ai.api-key}
         chat:
           # Flash-class model that is free of charge on the Gemini Developer API (check the pricing page for changes)
           model: ${LLM_MODEL:gemini-3.5-flash}
+    openai:
+      # Used when LLM_PROVIDER=openai-compatible: OpenAI, Mistral, Groq, DeepSeek, OpenRouter...
+      api-key: ${partsflow.ai.api-key}
+      base-url: ${partsflow.ai.base-url}
+      # The SDK retries on its own; only LlmGateway should retry (see OpenAiCompatibleConfiguration)
+      max-retries: 0
+      chat:
+        model: ${partsflow.ai.model}
   application:
     name: partsflow
   datasource:
@@ -38,6 +50,14 @@ management:
 
 partsflow:
   ai:
+    # LLM settings, only from environment variables (see README, "Choosing the LLM provider")
+    provider: ${LLM_PROVIDER:gemini}
+    api-key: ${LLM_API_KEY:}
+    base-url: ${LLM_BASE_URL:}
+    model: ${LLM_MODEL:}
+    chat-model:
+      gemini: google-genai
+      openai-compatible: openai
     max-agent-steps: 5
     retry:
       max-attempts: 3

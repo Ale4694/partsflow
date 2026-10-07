@@ -1,4 +1,4 @@
-package io.github.ale4694.partsflow.ai;
+package io.github.ale4694.partsflow.ai.provider;
 
 import java.time.Duration;
 import java.util.Locale;
@@ -13,23 +13,26 @@ import java.util.regex.Pattern;
  * @param daily true for a daily quota (it cannot recover within a request, so waiting and retrying is pointless)
  * @param suggestedDelay how long the provider asks us to wait, or null when it did not say
  */
-record QuotaAdvice(boolean daily, Duration suggestedDelay) {
+public record QuotaAdvice(boolean daily, Duration suggestedDelay) {
 
 	/** A delay this long can only be a daily (or otherwise long-lived) quota, never a per-minute limit. */
 	private static final Duration LONG_DELAY = Duration.ofHours(1);
 
 	private static final Pattern RETRY_DELAY_FIELD = Pattern.compile("retryDelay\"?\\s*[:=]\\s*\"?(\\d+(?:\\.\\d+)?)s",
 			Pattern.CASE_INSENSITIVE);
-	private static final Pattern RETRY_IN = Pattern.compile("retry in ((?:\\d+(?:\\.\\d+)?(?:ms|h|m|s)\\s*)+)",
+	private static final Pattern RETRY_IN = Pattern.compile("(?:retry|try again) in ((?:\\d+(?:\\.\\d+)?(?:ms|h|m|s)\\s*)+)",
 			Pattern.CASE_INSENSITIVE);
 	private static final Pattern DURATION_PART = Pattern.compile("(\\d+(?:\\.\\d+)?)(ms|h|m|s)");
 
-	static QuotaAdvice from(String providerMessage) {
+	/** Wording providers use for a per-day limit: Gemini "PerDay", Groq "tokens per day (TPD)", OpenRouter "per-day". */
+	private static final Pattern DAILY_WORDING = Pattern.compile("per ?-?day|daily|\\b(?:tpd|rpd)\\b",
+			Pattern.CASE_INSENSITIVE);
+
+	/** Reads the provider's error text (any provider: the wording above and "retry in" / "try again in"). */
+	public static QuotaAdvice from(String providerMessage) {
 		String text = providerMessage == null ? "" : providerMessage;
 		Duration delay = suggestedDelay(text);
-		String lower = text.toLowerCase(Locale.ROOT);
-		boolean daily = lower.contains("perday") || lower.contains("per day") || lower.contains("daily")
-				|| (delay != null && delay.compareTo(LONG_DELAY) >= 0);
+		boolean daily = DAILY_WORDING.matcher(text).find() || (delay != null && delay.compareTo(LONG_DELAY) >= 0);
 		return new QuotaAdvice(daily, delay);
 	}
 
@@ -61,7 +64,7 @@ record QuotaAdvice(boolean daily, Duration suggestedDelay) {
 	}
 
 	/** "about 9 hours", "about 12 minutes", "about 33 seconds": for messages meant for people. */
-	static String describe(Duration delay) {
+	public static String describe(Duration delay) {
 		long seconds = Math.max(1, Math.round(delay.toMillis() / 1000.0));
 		if (seconds < 90) {
 			return seconds + (seconds == 1 ? " second" : " seconds");

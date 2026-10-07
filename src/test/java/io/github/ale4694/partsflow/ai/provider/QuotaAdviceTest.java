@@ -1,4 +1,4 @@
-package io.github.ale4694.partsflow.ai;
+package io.github.ale4694.partsflow.ai.provider;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

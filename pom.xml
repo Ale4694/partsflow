@@ -77,7 +77,20 @@
 			<artifactId>pdfbox</artifactId>
 			<version>${pdfbox.version}</version>
 		</dependency>
-		<!-- Gemini Developer API (API key) through Spring AI -->
+		<!-- LLM providers through Spring AI; LLM_PROVIDER selects which one is active (see the README) -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-model-openai</artifactId>
+			<exclusions>
+				<!-- openai-java brings the old javax flavour of the swagger annotations, which has the same classes
+				     as swagger-annotations-jakarta (used by springdoc) and breaks /v3/api-docs (NoSuchMethodError) -->
+				<exclusion>
+					<groupId>io.swagger.core.v3</groupId>
+					<artifactId>swagger-annotations</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- Gemini Developer API (API key) -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-model-google-genai</artifactId>
