@@ -3,6 +3,7 @@ package io.github.ale4694.partsflow.catalog;
 import io.github.ale4694.partsflow.common.PageResponse;
 import jakarta.validation.Valid;
 import java.net.URI;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,7 @@ public class ItemController {
 	}
 
 	@GetMapping
-	PageResponse<ItemResponse> list(@PageableDefault(size = 20, sort = "id") Pageable pageable) {
+	PageResponse<ItemResponse> list(@ParameterObject @PageableDefault(size = 20, sort = "id") Pageable pageable) {
 		return service.list(pageable);
 	}
 

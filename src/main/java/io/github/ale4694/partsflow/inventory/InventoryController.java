@@ -3,6 +3,7 @@ package io.github.ale4694.partsflow.inventory;
 import io.github.ale4694.partsflow.common.PageResponse;
 import jakarta.validation.Valid;
 import java.net.URI;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -34,7 +35,7 @@ public class InventoryController {
 	/** Movement history, newest first; optionally for a single item. */
 	@GetMapping("/movements")
 	PageResponse<StockMovementResponse> movements(@RequestParam(required = false) Long itemId,
-			@PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+			@ParameterObject @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 		return service.listMovements(itemId, pageable);
 	}
 
@@ -44,7 +45,7 @@ public class InventoryController {
 	}
 
 	@GetMapping("/low-stock")
-	PageResponse<LowStockItem> lowStock(@PageableDefault(size = 20) Pageable pageable) {
+	PageResponse<LowStockItem> lowStock(@ParameterObject @PageableDefault(size = 20) Pageable pageable) {
 		return service.listLowStock(pageable);
 	}
 }
