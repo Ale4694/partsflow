@@ -15,7 +15,7 @@ public final class Quantities {
 		BigDecimal stripped = value.stripTrailingZeros();
 		if (stripped.scale() > MAX_DECIMALS) {
 			throw new InvalidDocumentException(
-					"Quantity " + value.toPlainString() + " has more than " + MAX_DECIMALS + " decimals");
+					"La quantità " + value.toPlainString() + " ha più di " + MAX_DECIMALS + " decimali");
 		}
 		return stripped.scale() < 0 ? stripped.setScale(0) : stripped;
 	}

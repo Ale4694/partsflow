@@ -35,8 +35,9 @@ public final class DocumentTotalsValidator {
 			BigDecimal linesTotal = fromLines.getOrDefault(rate, BigDecimal.ZERO);
 			BigDecimal summaryTotal = fromSummaries.getOrDefault(rate, BigDecimal.ZERO);
 			if (linesTotal.subtract(summaryTotal).abs().compareTo(TOLERANCE) > 0) {
-				throw new InvalidDocumentException("Totals do not match for VAT rate " + rate + ": lines add up to "
-						+ linesTotal.setScale(2, RoundingMode.HALF_UP) + " but DatiRiepilogo declares "
+				throw new InvalidDocumentException("I totali non corrispondono per l'aliquota IVA " + rate
+						+ ": le righe sommano " + linesTotal.setScale(2, RoundingMode.HALF_UP)
+						+ " ma DatiRiepilogo dichiara "
 						+ summaryTotal.setScale(2, RoundingMode.HALF_UP));
 			}
 		}

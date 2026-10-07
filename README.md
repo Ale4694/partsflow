@@ -214,7 +214,7 @@ Interactive documentation: Swagger UI at `/swagger-ui.html`, OpenAPI JSON at `/v
 | `POST /api/ai/suggestions/{id}/accept` / `reject` | Decide on a suggestion |
 | `POST /api/ai/assistant` | Ask a question about stock in plain language |
 
-Errors are always [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) `application/problem+json`. The AI endpoints add a stable `code` field (`AI_KEY_MISSING`, `AI_REJECTED`, `AI_DAILY_QUOTA_EXHAUSTED`, `AI_RATE_LIMITED`, `AI_TEMPORARILY_UNAVAILABLE`, `AI_BAD_ANSWER`, plus `retryAfterSeconds` when known) that the web interface uses to show its own message:
+Errors are always [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) `application/problem+json`. The `detail` text is written in Italian because the web interface shows it as is (code, logs and identifiers stay in English). The AI endpoints add a stable `code` field (`AI_KEY_MISSING`, `AI_REJECTED`, `AI_DAILY_QUOTA_EXHAUSTED`, `AI_RATE_LIMITED`, `AI_TEMPORARILY_UNAVAILABLE`, `AI_BAD_ANSWER`, plus `retryAfterSeconds` when known) that the web interface uses to show its own message:
 
 | Status | Meaning |
 | --- | --- |

@@ -51,7 +51,7 @@ class InventoryControllerTest {
 		mvc.perform(post("/api/inventory/movements").contentType(MediaType.APPLICATION_JSON).content("""
 				{"itemId": 10, "type": "OUT", "quantity": 10, "reason": "sale"}"""))
 				.andExpect(status().isConflict())
-				.andExpect(jsonPath("$.detail").value("Insufficient stock for item 10: available 1, requested 10"));
+				.andExpect(jsonPath("$.detail").value("Giacenza insufficiente per l'articolo 10: disponibili 1, richiesti 10"));
 	}
 
 	@Test

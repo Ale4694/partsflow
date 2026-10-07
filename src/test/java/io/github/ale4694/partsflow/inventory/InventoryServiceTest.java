@@ -92,7 +92,7 @@ class InventoryServiceTest {
 
 		assertThatThrownBy(() -> service.record(request(MovementType.OUT, "3.001")))
 				.isInstanceOf(InsufficientStockException.class)
-				.hasMessageContaining("available 3, requested 3.001");
+				.hasMessageContaining("disponibili 3, richiesti 3.001");
 		assertThat(stock.getQuantity()).isEqualByComparingTo("3");
 		verify(movements, never()).save(any());
 	}
@@ -139,7 +139,7 @@ class InventoryServiceTest {
 
 		assertThatThrownBy(() -> service.record(request(MovementType.IN, "1")))
 				.isInstanceOf(ConflictException.class)
-				.hasMessageContaining("concurrently");
+				.hasMessageContaining("nello stesso momento");
 		verify(stocks, times(RetryingTransaction.MAX_ATTEMPTS)).save(any(Stock.class));
 	}
 

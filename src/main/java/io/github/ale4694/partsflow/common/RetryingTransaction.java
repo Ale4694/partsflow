@@ -41,7 +41,7 @@ public class RetryingTransaction {
 			catch (ObjectOptimisticLockingFailureException | DataIntegrityViolationException ex) {
 				// Another transaction changed the same row (or created it first): try again on fresh data
 				if (attempt == MAX_ATTEMPTS) {
-					throw new ConflictException("The data was modified concurrently, please retry");
+					throw new ConflictException("I dati sono stati modificati nello stesso momento da qualcun altro: riprova");
 				}
 				log.debug("Concurrent update, retrying (attempt {})", attempt);
 			}

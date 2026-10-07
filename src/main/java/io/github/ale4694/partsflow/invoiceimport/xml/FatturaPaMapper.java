@@ -34,10 +34,10 @@ public class FatturaPaMapper {
 		SupplierParty supplier = toSupplier(cedente);
 
 		if (xml.bodies() == null || xml.bodies().isEmpty()) {
-			throw new MalformedDocumentException("Missing element FatturaElettronicaBody");
+			throw new MalformedDocumentException("Elemento mancante: FatturaElettronicaBody");
 		}
 		if (xml.bodies().size() > 1) {
-			throw new InvalidDocumentException("Files containing several documents are not supported");
+			throw new InvalidDocumentException("I file che contengono più documenti non sono supportati");
 		}
 		FatturaPaXml.Body body = xml.bodies().getFirst();
 
@@ -47,17 +47,17 @@ public class FatturaPaMapper {
 		String tipoDocumento = requireText(documento.tipoDocumento(), "TipoDocumento");
 		String divisa = requireText(documento.divisa(), "Divisa");
 		if (!"EUR".equals(divisa)) {
-			throw new InvalidDocumentException("Only documents in EUR are supported, got " + divisa);
+			throw new InvalidDocumentException("Sono supportati solo documenti in EUR, trovato " + divisa);
 		}
 
 		FatturaPaXml.DatiBeniServizi beni = require(body.datiBeniServizi(), "DatiBeniServizi");
 		List<DocumentLine> lines = list(beni.dettaglioLinee()).stream().map(this::toLine).toList();
 		List<VatSummary> summaries = list(beni.datiRiepilogo()).stream().map(this::toSummary).toList();
 		if (lines.isEmpty()) {
-			throw new MalformedDocumentException("Missing element DettaglioLinee");
+			throw new MalformedDocumentException("Elemento mancante: DettaglioLinee");
 		}
 		if (summaries.isEmpty()) {
-			throw new MalformedDocumentException("Missing element DatiRiepilogo");
+			throw new MalformedDocumentException("Elemento mancante: DatiRiepilogo");
 		}
 
 		BigDecimal total = documento.importoTotaleDocumento() != null && !documento.importoTotaleDocumento().isBlank()
@@ -73,7 +73,7 @@ public class FatturaPaMapper {
 			case "TD01", "TD24" -> new Invoice(documentBody);
 			case "TD04" -> new CreditNote(documentBody);
 			default -> throw new InvalidDocumentException(
-					"Document type " + tipoDocumento + " is not supported (supported: TD01, TD04, TD24)");
+					"Il tipo di documento " + tipoDocumento + " non è supportato (supportati: TD01, TD04, TD24)");
 		};
 		DocumentTotalsValidator.validate(documentBody);
 		return document;
@@ -87,7 +87,7 @@ public class FatturaPaMapper {
 				? anagrafica.denominazione().trim()
 				: (text(anagrafica.nome()) + " " + text(anagrafica.cognome())).trim();
 		if (name.isEmpty()) {
-			throw new MalformedDocumentException("Missing supplier name (Anagrafica)");
+			throw new MalformedDocumentException("Nome del fornitore mancante (Anagrafica)");
 		}
 		return new SupplierParty(requireText(id.idCodice(), "IdCodice").toUpperCase(Locale.ROOT), name);
 	}
@@ -133,7 +133,7 @@ public class FatturaPaMapper {
 			return new BigDecimal(text.trim());
 		}
 		catch (NumberFormatException ex) {
-			throw new MalformedDocumentException("Invalid number in " + element + ": '" + text + "'");
+			throw new MalformedDocumentException("Numero non valido in " + element + ": '" + text + "'");
 		}
 	}
 
@@ -142,7 +142,7 @@ public class FatturaPaMapper {
 			return Long.parseLong(text.trim());
 		}
 		catch (NumberFormatException ex) {
-			throw new MalformedDocumentException("Invalid number in " + element + ": '" + text + "'");
+			throw new MalformedDocumentException("Numero non valido in " + element + ": '" + text + "'");
 		}
 	}
 
@@ -151,20 +151,20 @@ public class FatturaPaMapper {
 			return LocalDate.parse(requireText(text, element));
 		}
 		catch (DateTimeParseException ex) {
-			throw new MalformedDocumentException("Invalid date in " + element + ": '" + text + "' (expected yyyy-MM-dd)");
+			throw new MalformedDocumentException("Data non valida in " + element + ": '" + text + "' (atteso aaaa-mm-gg)");
 		}
 	}
 
 	private <T> T require(T value, String element) {
 		if (value == null) {
-			throw new MalformedDocumentException("Missing element " + element);
+			throw new MalformedDocumentException("Elemento mancante: " + element);
 		}
 		return value;
 	}
 
 	private String requireText(String value, String element) {
 		if (value == null || value.isBlank()) {
-			throw new MalformedDocumentException("Missing element " + element);
+			throw new MalformedDocumentException("Elemento mancante: " + element);
 		}
 		return value.trim();
 	}

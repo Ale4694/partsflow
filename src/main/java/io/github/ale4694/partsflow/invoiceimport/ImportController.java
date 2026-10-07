@@ -37,7 +37,7 @@ public class ImportController {
 	@PostMapping(path = "/fatturapa", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	ResponseEntity<DraftResponse> uploadFatturaPa(@RequestParam("file") MultipartFile file) throws IOException {
 		if (file.isEmpty()) {
-			throw new MalformedDocumentException("The uploaded file is empty");
+			throw new MalformedDocumentException("Il file caricato è vuoto");
 		}
 		DraftResponse draft;
 		try (InputStream xml = file.getInputStream()) {

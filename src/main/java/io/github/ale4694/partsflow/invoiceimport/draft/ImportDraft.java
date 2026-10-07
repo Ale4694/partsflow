@@ -116,7 +116,7 @@ public class ImportDraft {
 	/** Lines can only be changed (or the draft deleted) while it is still a draft. */
 	public void requireOpen() {
 		if (status != DraftStatus.DRAFT) {
-			throw new ConflictException("Draft " + id + " is already confirmed");
+			throw new ConflictException("La bozza " + id + " è già confermata");
 		}
 	}
 
@@ -126,7 +126,7 @@ public class ImportDraft {
 		long pending = pendingLineCount();
 		if (pending > 0) {
 			throw new ConflictException(
-					"Draft " + id + " still has " + pending + " line(s) pending review: resolve or skip them first");
+					"La bozza " + id + " ha ancora " + pending + " righe da verificare: abbinale a un articolo o ignorale");
 		}
 		this.status = DraftStatus.CONFIRMED;
 		this.confirmedAt = now;

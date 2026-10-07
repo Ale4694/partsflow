@@ -50,7 +50,7 @@ class DocumentTotalsValidatorTest {
 		assertThatThrownBy(() -> DocumentTotalsValidator.validate(
 				body(List.of(line("10.00", "22")), List.of(summary("22", "10.00"), summary("10", "7.00")))))
 				.isInstanceOf(InvalidDocumentException.class)
-				.hasMessageContaining("VAT rate 10.00");
+				.hasMessageContaining("aliquota IVA 10.00");
 	}
 
 	@Test
@@ -58,6 +58,6 @@ class DocumentTotalsValidatorTest {
 		assertThatThrownBy(() -> DocumentTotalsValidator.validate(
 				body(List.of(line("10.00", "22"), line("3.00", "4")), List.of(summary("22", "10.00")))))
 				.isInstanceOf(InvalidDocumentException.class)
-				.hasMessageContaining("VAT rate 4.00");
+				.hasMessageContaining("aliquota IVA 4.00");
 	}
 }

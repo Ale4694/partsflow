@@ -31,7 +31,7 @@ class PdfTextExtractorTest {
 	void aPdfWithoutTextIsRejected() {
 		assertThatThrownBy(() -> extractor(30000).extract(SyntheticPdfs.blankPage()))
 				.isInstanceOf(InvalidDocumentException.class)
-				.hasMessageContaining("no extractable text");
+				.hasMessageContaining("non contiene testo estraibile");
 	}
 
 	@Test
@@ -40,7 +40,7 @@ class PdfTextExtractorTest {
 
 		assertThatThrownBy(() -> extractor(100).extract(pdf))
 				.isInstanceOf(InvalidDocumentException.class)
-				.hasMessageContaining("too much");
+				.hasMessageContaining("troppi");
 	}
 
 	@Test

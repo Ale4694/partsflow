@@ -37,7 +37,7 @@ class ApiExceptionHandlerTest {
 				.andExpect(status().isInternalServerError())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
 				.andExpect(jsonPath("$.status").value(500))
-				.andExpect(jsonPath("$.detail").value("Unexpected server error"));
+				.andExpect(jsonPath("$.detail").value("Errore imprevisto del server"));
 	}
 
 	@Test

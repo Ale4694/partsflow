@@ -178,7 +178,7 @@ class ImportApiIntegrationTest {
 		long draftId = uploadOk("invoice-valid.xml");
 
 		upload(fixture("invoice-valid.xml")).andExpect(status().isConflict())
-				.andExpect(jsonPath("$.detail").value(Matchers.containsString("already imported")));
+				.andExpect(jsonPath("$.detail").value(Matchers.containsString("già stato importato")));
 
 		mvc.perform(delete("/api/imports/" + draftId)).andExpect(status().isNoContent());
 		uploadOk("invoice-valid.xml");
@@ -198,7 +198,7 @@ class ImportApiIntegrationTest {
 
 		// cannot confirm while lines are pending, and nothing was loaded
 		mvc.perform(post("/api/imports/" + draftId + "/confirm")).andExpect(status().isConflict())
-				.andExpect(jsonPath("$.detail").value(Matchers.containsString("pending review")));
+				.andExpect(jsonPath("$.detail").value(Matchers.containsString("righe da verificare")));
 		assertThat(stockOf(engineOil)).isZero();
 
 		Item timingBelt = items.save(new Item("IMP-TB-" + vat, "Timing belt kit", "PZ", BigDecimal.ZERO));
@@ -291,17 +291,17 @@ class ImportApiIntegrationTest {
 	@Test
 	void rejectedFilesReturnClearErrors() throws Exception {
 		upload(fixture("malformed.xml")).andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.detail").value(Matchers.containsString("Not a readable FatturaPA")));
+				.andExpect(jsonPath("$.detail").value(Matchers.containsString("FatturaPA leggibile")));
 
 		upload(new byte[0]).andExpect(status().isBadRequest());
 
 		upload(fixture("totals-mismatch.xml")).andExpect(status().isUnprocessableContent())
-				.andExpect(jsonPath("$.detail").value(Matchers.containsString("Totals do not match")));
+				.andExpect(jsonPath("$.detail").value(Matchers.containsString("I totali non corrispondono")));
 
 		String unknownSupplier = new String(fixture("invoice-valid.xml"), StandardCharsets.UTF_8).replace(vat,
 				"39999999999");
 		upload(unknownSupplier.getBytes(StandardCharsets.UTF_8)).andExpect(status().isUnprocessableContent())
-				.andExpect(jsonPath("$.detail").value(Matchers.containsString("Unknown supplier")));
+				.andExpect(jsonPath("$.detail").value(Matchers.containsString("Fornitore sconosciuto")));
 	}
 
 	@Test

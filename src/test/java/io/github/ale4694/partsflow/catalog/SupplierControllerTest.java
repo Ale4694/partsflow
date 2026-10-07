@@ -72,7 +72,7 @@ class SupplierControllerTest {
 
 		mvc.perform(get("/api/suppliers/9"))
 				.andExpect(status().isNotFound())
-				.andExpect(jsonPath("$.detail").value("Supplier 9 not found"));
+				.andExpect(jsonPath("$.detail").value("Fornitore 9 non trovato"));
 	}
 
 	@Test

@@ -79,12 +79,12 @@ public class ImportService {
 	public DraftResponse createDraft(Document document, DraftSource source) {
 		DocumentBody body = document.body();
 		Supplier supplier = suppliers.findByVatNumber(body.supplier().vatNumber())
-				.orElseThrow(() -> new InvalidDocumentException("Unknown supplier with VAT number "
+				.orElseThrow(() -> new InvalidDocumentException("Fornitore sconosciuto con partita IVA "
 						+ body.supplier().vatNumber() + " (" + body.supplier().name()
-						+ "): create the supplier in the catalog first"));
+						+ "): crea prima il fornitore nel catalogo"));
 		if (drafts.existsBySupplierIdAndDocumentNumberAndDocumentDate(supplier.getId(), body.number(), body.date())) {
-			throw new ConflictException("Document " + body.number() + " of " + body.date() + " from "
-					+ supplier.getName() + " was already imported");
+			throw new ConflictException("Il documento " + body.number() + " del " + body.date() + " di "
+					+ supplier.getName() + " è già stato importato");
 		}
 
 		ImportDraft draft = new ImportDraft(supplier, source, body.tipoDocumento(), body.number(), body.date(), body.total(),
@@ -188,7 +188,7 @@ public class ImportService {
 		ImportDraft draft = drafts.findForUpdate(draftId)
 				.orElseThrow(() -> new ResourceNotFoundException("Draft", draftId));
 		if (draft.getStatus() == DraftStatus.CONFIRMED) {
-			throw new ConflictException("Draft " + draftId + " is confirmed: its stock movements were already written");
+			throw new ConflictException("La bozza " + draftId + " è confermata: i suoi movimenti di magazzino sono già stati scritti");
 		}
 		drafts.delete(draft);
 	}
@@ -214,7 +214,7 @@ public class ImportService {
 	private ImportDraftLine pendingLine(ImportDraft draft, Long lineId) {
 		ImportDraftLine line = draft.getLine(lineId);
 		if (line.getStatus() != LineStatus.PENDING_REVIEW) {
-			throw new ConflictException("Line " + lineId + " is not pending review (status " + line.getStatus() + ")");
+			throw new ConflictException("La riga " + lineId + " non è da verificare (stato " + line.getStatus() + ")");
 		}
 		return line;
 	}

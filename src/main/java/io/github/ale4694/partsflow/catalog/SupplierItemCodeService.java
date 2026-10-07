@@ -62,6 +62,6 @@ public class SupplierItemCodeService {
 	}
 
 	private ConflictException duplicate(String supplierCode) {
-		return new ConflictException("This supplier already has a mapping for code " + supplierCode);
+		return new ConflictException("Questo fornitore ha già un abbinamento per il codice " + supplierCode);
 	}
 }

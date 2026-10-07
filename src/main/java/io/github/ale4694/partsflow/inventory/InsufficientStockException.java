@@ -7,7 +7,8 @@ import java.math.BigDecimal;
 public class InsufficientStockException extends ConflictException {
 
 	public InsufficientStockException(Long itemId, BigDecimal available, BigDecimal requested) {
-		super("Insufficient stock for item " + itemId + ": available " + available.stripTrailingZeros().toPlainString()
-				+ ", requested " + requested.stripTrailingZeros().toPlainString());
+		super("Giacenza insufficiente per l'articolo " + itemId + ": disponibili "
+				+ available.stripTrailingZeros().toPlainString() + ", richiesti "
+				+ requested.stripTrailingZeros().toPlainString());
 	}
 }

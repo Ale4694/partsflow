@@ -103,7 +103,7 @@ class FatturaPaParserTest {
 	void malformedXmlIsRejectedAsMalformed() {
 		assertThatThrownBy(() -> parser.parse(fixture("malformed.xml")))
 				.isInstanceOf(MalformedDocumentException.class)
-				.hasMessageContaining("Not a readable FatturaPA XML file");
+				.hasMessageContaining("non è una fattura elettronica FatturaPA leggibile");
 	}
 
 	@Test
@@ -115,14 +115,14 @@ class FatturaPaParserTest {
 	void validXmlThatIsNotAnInvoiceIsMalformed() {
 		assertThatThrownBy(() -> parser.parse(xml("<html><body>hello</body></html>")))
 				.isInstanceOf(MalformedDocumentException.class)
-				.hasMessageContaining("Missing element");
+				.hasMessageContaining("Elemento mancante");
 	}
 
 	@Test
 	void totalsMismatchIsRejectedWithAClearMessage() {
 		assertThatThrownBy(() -> parser.parse(fixture("totals-mismatch.xml")))
 				.isInstanceOf(InvalidDocumentException.class)
-				.hasMessageContaining("VAT rate 22.00")
+				.hasMessageContaining("aliquota IVA 22.00")
 				.hasMessageContaining("505.00")
 				.hasMessageContaining("500.00");
 	}
@@ -171,7 +171,7 @@ class FatturaPaParserTest {
 				"<Quantita>10.0005</Quantita>");
 
 		assertThatThrownBy(() -> parser.parse(xml(precise))).isInstanceOf(InvalidDocumentException.class)
-				.hasMessageContaining("decimals");
+				.hasMessageContaining("decimali");
 	}
 
 	@Test
@@ -197,7 +197,7 @@ class FatturaPaParserTest {
 		String twice = text.replace(body, body + body);
 
 		assertThatThrownBy(() -> parser.parse(xml(twice))).isInstanceOf(InvalidDocumentException.class)
-				.hasMessageContaining("several documents");
+				.hasMessageContaining("più documenti");
 	}
 
 	@Test

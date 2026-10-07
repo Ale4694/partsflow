@@ -102,7 +102,7 @@ class PdfImportIntegrationTest extends AiIntegrationTestBase {
 		llmReturns(extracted("INVOICE", supplier.getVatNumber(), "PDF-BAD-" + n, "9999.00"));
 
 		upload(pdf()).andExpect(status().isUnprocessableContent())
-				.andExpect(jsonPath("$.detail").value(org.hamcrest.Matchers.containsString("probably wrong or incomplete")));
+				.andExpect(jsonPath("$.detail").value(org.hamcrest.Matchers.containsString("probabilmente sbagliata o incompleta")));
 
 		mvc.perform(get("/api/imports?size=100&sort=id,desc"))
 				.andExpect(jsonPath("$.content[?(@.number == 'PDF-BAD-" + n + "')]").isEmpty());
@@ -113,7 +113,7 @@ class PdfImportIntegrationTest extends AiIntegrationTestBase {
 		llmReturns(extracted("INVOICE", "49999999999", "PDF-X-" + next(), "597.80"));
 
 		upload(pdf()).andExpect(status().isUnprocessableContent())
-				.andExpect(jsonPath("$.detail").value(org.hamcrest.Matchers.containsString("Unknown supplier")));
+				.andExpect(jsonPath("$.detail").value(org.hamcrest.Matchers.containsString("Fornitore sconosciuto")));
 	}
 
 	@Test

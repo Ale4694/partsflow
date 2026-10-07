@@ -45,6 +45,30 @@ describe('problemDetailInterceptor', () => {
     ]);
   });
 
+  describe('import of a document from an unknown supplier (HTTP 422)', () => {
+    const detail =
+      'Fornitore sconosciuto con partita IVA 20000000001 (Ricambi Rossi Srl): crea prima il fornitore nel catalogo';
+
+    it.each([
+      ['/api/imports/fatturapa', 'a FatturaPA XML'],
+      ['/api/ai/imports/pdf', 'a supplier PDF'],
+    ])('shows the Italian message of the backend for %s (%s)', (url) => {
+      let failed = false;
+      http.post(url, new FormData()).subscribe({ error: () => (failed = true) });
+
+      backend
+        .expectOne(url)
+        .flush(
+          { title: 'Unprocessable Content', status: 422, detail },
+          { status: 422, statusText: 'Unprocessable Content' },
+        );
+
+      expect(failed).toBe(true);
+      expect(notifications.notifications()).toEqual([expect.objectContaining({ kind: 'error', message: detail })]);
+      expect(notifications.notifications()[0].message).toContain('crea prima il fornitore nel catalogo');
+    });
+  });
+
   it('falls back to the title when there is no detail', () => {
     http.get('/api/items').subscribe({ error: () => undefined });
 

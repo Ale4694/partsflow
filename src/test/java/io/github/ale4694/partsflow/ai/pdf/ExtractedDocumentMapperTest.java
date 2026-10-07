@@ -77,11 +77,11 @@ class ExtractedDocumentMapperTest {
 	void unreadableValuesAreRejected() {
 		ExtractedDocument base = invoice("INVOICE", "597.80");
 		assertThatThrownBy(() -> mapper.toDocument(withDate(base, "10/03/2026")))
-				.isInstanceOf(InvalidDocumentException.class).hasMessageContaining("yyyy-MM-dd");
+				.isInstanceOf(InvalidDocumentException.class).hasMessageContaining("aaaa-mm-gg");
 		assertThatThrownBy(() -> mapper.toDocument(withTotal(base, "5.978,00")))
-				.isInstanceOf(InvalidDocumentException.class).hasMessageContaining("plain decimal");
+				.isInstanceOf(InvalidDocumentException.class).hasMessageContaining("numero decimale semplice");
 		assertThatThrownBy(() -> mapper.toDocument(invoice("PURCHASE_ORDER", "597.80")))
-				.isInstanceOf(InvalidDocumentException.class).hasMessageContaining("document type");
+				.isInstanceOf(InvalidDocumentException.class).hasMessageContaining("Tipo di documento");
 	}
 
 	@Test
@@ -89,7 +89,7 @@ class ExtractedDocumentMapperTest {
 		ExtractedDocument noVat = new ExtractedDocument("INVOICE", "Ricambi Rossi Srl", "null", "FT-1/2026",
 				"2026-03-10", "EUR", "597.80", invoice("INVOICE", "597.80").lines());
 		assertThatThrownBy(() -> mapper.toDocument(noVat)).isInstanceOf(InvalidDocumentException.class)
-				.hasMessageContaining("VAT number");
+				.hasMessageContaining("partita IVA");
 
 		ExtractedDocument noLines = new ExtractedDocument("INVOICE", "Ricambi Rossi Srl", "20000000001", "FT-1/2026",
 				"2026-03-10", "EUR", "0", List.of());
@@ -110,7 +110,7 @@ class ExtractedDocumentMapperTest {
 				base.supplierVatNumber(), base.number(), base.date(), "EUR", base.totalAmount(),
 				List.of(line("X", "Thing", "1.0005", "1", "1", "22")));
 		assertThatThrownBy(() -> mapper.toDocument(precise)).isInstanceOf(InvalidDocumentException.class)
-				.hasMessageContaining("decimals");
+				.hasMessageContaining("decimali");
 	}
 
 	private ExtractedDocument withDate(ExtractedDocument d, String date) {

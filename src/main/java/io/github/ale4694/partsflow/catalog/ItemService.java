@@ -19,7 +19,7 @@ public class ItemService {
 
 	public ItemResponse create(ItemRequest request) {
 		if (items.existsByCode(request.code())) {
-			throw new ConflictException("An item with code " + request.code() + " already exists");
+			throw new ConflictException("Esiste già un articolo con codice " + request.code());
 		}
 		Item item = new Item(request.code(), request.description(), request.unit(), request.reorderThreshold());
 		return ItemResponse.from(items.save(item));
@@ -43,7 +43,7 @@ public class ItemService {
 	public ItemResponse update(Long id, ItemRequest request) {
 		Item item = find(id);
 		if (items.existsByCodeAndIdNot(request.code(), id)) {
-			throw new ConflictException("An item with code " + request.code() + " already exists");
+			throw new ConflictException("Esiste già un articolo con codice " + request.code());
 		}
 		item.update(request.code(), request.description(), request.unit(), request.reorderThreshold());
 		return ItemResponse.from(item);

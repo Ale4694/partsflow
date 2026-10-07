@@ -24,22 +24,22 @@ public class PdfTextExtractor {
 	public String extract(byte[] pdf) {
 		try (PDDocument document = Loader.loadPDF(pdf)) {
 			if (document.getNumberOfPages() > MAX_PAGES) {
-				throw new InvalidDocumentException("The PDF has more than " + MAX_PAGES + " pages");
+				throw new InvalidDocumentException("Il PDF ha più di " + MAX_PAGES + " pagine");
 			}
 			String text = new PDFTextStripper().getText(document).strip();
 			if (text.isEmpty()) {
 				throw new InvalidDocumentException(
-						"The PDF contains no extractable text (scanned documents are not supported)");
+						"Il PDF non contiene testo estraibile (i documenti scansionati non sono supportati)");
 			}
 			if (text.length() > properties.maxPdfTextChars()) {
-				throw new InvalidDocumentException("The PDF text is longer than " + properties.maxPdfTextChars()
-						+ " characters, which is too much to send to the LLM");
+				throw new InvalidDocumentException("Il testo del PDF supera " + properties.maxPdfTextChars()
+						+ " caratteri, troppi da inviare all'AI");
 			}
 			return text;
 		}
 		catch (IOException ex) {
 			// PDFBox reports broken, truncated and password protected files as IOException
-			throw new MalformedDocumentException("Not a readable PDF file", ex);
+			throw new MalformedDocumentException("Il file non è un PDF leggibile", ex);
 		}
 	}
 }

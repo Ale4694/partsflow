@@ -19,7 +19,7 @@ public class SupplierService {
 
 	public SupplierResponse create(SupplierRequest request) {
 		if (suppliers.existsByVatNumber(request.vatNumber())) {
-			throw new ConflictException("A supplier with VAT number " + request.vatNumber() + " already exists");
+			throw new ConflictException("Esiste già un fornitore con partita IVA " + request.vatNumber());
 		}
 		return SupplierResponse.from(suppliers.save(new Supplier(request.name(), request.vatNumber())));
 	}
@@ -37,7 +37,7 @@ public class SupplierService {
 	public SupplierResponse update(Long id, SupplierRequest request) {
 		Supplier supplier = find(id);
 		if (suppliers.existsByVatNumberAndIdNot(request.vatNumber(), id)) {
-			throw new ConflictException("A supplier with VAT number " + request.vatNumber() + " already exists");
+			throw new ConflictException("Esiste già un fornitore con partita IVA " + request.vatNumber());
 		}
 		supplier.update(request.name(), request.vatNumber());
 		return SupplierResponse.from(supplier);

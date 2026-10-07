@@ -52,7 +52,7 @@ class InvalidSortIntegrationTest {
 				mvc.perform(get(url).param("page", "0").param("size", "1").param("sort", sort))
 						.andExpect(status().isBadRequest())
 						.andExpect(jsonPath("$.status").value(400))
-						.andExpect(jsonPath("$.detail").value(containsString("Unknown sort property: ")))
+						.andExpect(jsonPath("$.detail").value(containsString("Proprietà di ordinamento sconosciuta: ")))
 						.andExpect(jsonPath("$.detail").value(containsString("string")));
 			}
 		}

@@ -32,7 +32,7 @@ public class FatturaPaReader {
 			return mapper.readValue(xml, FatturaPaXml.class);
 		}
 		catch (JacksonException ex) {
-			throw new MalformedDocumentException("Not a readable FatturaPA XML file: " + ex.getOriginalMessage(), ex);
+			throw new MalformedDocumentException("Il file non è una fattura elettronica FatturaPA leggibile: " + ex.getOriginalMessage(), ex);
 		}
 	}
 }

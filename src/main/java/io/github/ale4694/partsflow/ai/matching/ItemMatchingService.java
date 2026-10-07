@@ -152,7 +152,7 @@ public class ItemMatchingService {
 		LineMatchSuggestion suggestion = find(suggestionId);
 		requireOpen(suggestion);
 		if (suggestion.getItemId() == null) {
-			throw new ConflictException("Suggestion " + suggestionId + " proposes no item: resolve the line manually");
+			throw new ConflictException("Il suggerimento " + suggestionId + " non propone nessun articolo: abbina la riga a mano");
 		}
 		importService.resolveLine(suggestion.getDraftId(), suggestion.getDraftLineId(), suggestion.getItemId());
 		suggestion.markAccepted();
@@ -173,7 +173,7 @@ public class ItemMatchingService {
 
 	private void requireOpen(LineMatchSuggestion suggestion) {
 		if (suggestion.getStatus() != SuggestionStatus.SUGGESTED) {
-			throw new ConflictException("Suggestion " + suggestion.getId() + " was already " + suggestion.getStatus());
+			throw new ConflictException("Il suggerimento " + suggestion.getId() + " è già stato deciso (stato " + suggestion.getStatus() + ")");
 		}
 	}
 

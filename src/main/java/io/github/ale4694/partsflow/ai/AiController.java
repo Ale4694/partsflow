@@ -58,7 +58,7 @@ public class AiController {
 	@PostMapping(path = "/imports/pdf", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	ResponseEntity<DraftResponse> importPdf(@RequestParam("file") MultipartFile file) throws IOException {
 		if (file.isEmpty()) {
-			throw new MalformedDocumentException("The uploaded file is empty");
+			throw new MalformedDocumentException("Il file caricato è vuoto");
 		}
 		DraftResponse draft = pdfImportService.importPdf(file.getBytes());
 		return ResponseEntity.created(URI.create("/api/imports/" + draft.id())).body(draft);
