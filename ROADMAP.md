@@ -10,9 +10,9 @@ Milestones are built in order. Each one ends with a passing `./mvnw verify` and 
 - [x] GitHub Actions workflow running `./mvnw -B verify` on push and pull request
 
 ## M1 — Catalog
-- [ ] Suppliers (name, VAT number), items (internal code, description, unit, reorder threshold), supplier item codes
-- [ ] CRUD REST APIs with record DTOs, validation, pagination
-- [ ] Unit tests and `@WebMvcTest` tests
+- [x] Suppliers (name, VAT number), items (internal code, description, unit, reorder threshold), supplier item codes
+- [x] CRUD REST APIs with record DTOs, validation, pagination
+- [x] Unit tests and `@WebMvcTest` tests
 
 ## M2 — Inventory
 - [ ] Stock movements (IN/OUT, quantity, reason, source document reference, timestamp) and current stock per item
