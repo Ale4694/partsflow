@@ -1,6 +1,6 @@
 .shell {
   display: grid;
-  grid-template-columns: 14rem 1fr;
+  grid-template-columns: 14rem minmax(0, 1fr);
   min-height: 100vh;
 }
 
@@ -66,7 +66,7 @@ nav a.active {
 
 .content {
   padding: var(--space-6);
-  max-width: 72rem;
+  max-width: 90rem;
   width: 100%;
 }
 

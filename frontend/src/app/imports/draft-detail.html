@@ -4,8 +4,10 @@
   @let d = draft.value();
 
   <header class="page-header">
-    <h1>{{ d.tipoDocumento }} n. {{ d.number }}</h1>
-    <app-draft-status [status]="d.status" />
+    <div class="title">
+      <h1>{{ d.tipoDocumento }} n. {{ d.number }}</h1>
+      <app-draft-status [status]="d.status" />
+    </div>
   </header>
 
   @if (d.source === 'PDF') {
@@ -74,12 +76,10 @@
             <th>Codice fornitore</th>
             <th>Descrizione</th>
             <th class="num">Quantità</th>
-            <th class="num">Prezzo unit.</th>
             <th class="num">Totale riga</th>
-            <th class="num">IVA</th>
             <th>Stato</th>
             <th>Articolo</th>
-            <th class="num">Effetto magazzino</th>
+            <th class="num">Magazzino</th>
             <th></th>
           </tr>
         </thead>
@@ -88,26 +88,34 @@
             <tr>
               <td>{{ line.lineNumber }}</td>
               <td>{{ line.supplierCode ?? '—' }}</td>
-              <td>{{ line.description }}</td>
-              <td class="num">{{ line.quantity | quantity }} {{ line.unit }}</td>
-              <td class="num">{{ line.unitPrice | money }}</td>
-              <td class="num">{{ line.totalPrice | money }}</td>
-              <td class="num">{{ line.vatRate | percent2 }}</td>
+              <td class="wide">{{ line.description }}</td>
+              <td class="num">
+                {{ line.quantity | quantity }} {{ line.unit }}
+                @if (line.unitPrice !== null) {
+                  <div class="muted">a {{ line.unitPrice | money }}</div>
+                }
+              </td>
+              <td class="num">
+                {{ line.totalPrice | money }}
+                <div class="muted">IVA {{ line.vatRate | percent2 }}</div>
+              </td>
               <td><app-line-status [status]="line.status" /></td>
               <td>{{ line.itemCode ?? '—' }}</td>
               <td class="num">{{ line.stockDelta | quantity }}</td>
               <td class="actions">
                 @if (d.status === 'DRAFT' && line.status === 'PENDING_REVIEW') {
-                  <button type="button" class="btn btn-small" [disabled]="busy()" (click)="toggleResolving(line)">
-                    Scegli articolo
-                  </button>
-                  <button type="button" class="btn btn-small" [disabled]="busy()" (click)="skip(line)">Ignora</button>
+                  <div class="stack">
+                    <button type="button" class="btn btn-small" [disabled]="busy()" (click)="toggleResolving(line)">
+                      Scegli articolo
+                    </button>
+                    <button type="button" class="btn btn-small" [disabled]="busy()" (click)="skip(line)">Ignora</button>
+                  </div>
                 }
               </td>
             </tr>
             @if (suggestionFor(line); as suggestion) {
               <tr class="extra-row">
-                <td colspan="11">
+                <td colspan="9">
                   <div class="suggestion">
                     <div>
                       <span class="badge">Suggerimento AI</span>
@@ -134,7 +142,7 @@
             }
             @if (resolvingLineId() === line.id) {
               <tr class="extra-row">
-                <td colspan="11">
+                <td colspan="9">
                   <strong>Scegli l’articolo per «{{ line.description }}»</strong>
                   <p class="muted">Il codice del fornitore verrà ricordato: la prossima fattura sarà riconosciuta da sola.</p>
                   <app-item-picker label="Cerca l’articolo per questa riga" (picked)="resolve(line, $event)" />

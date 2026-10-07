@@ -182,6 +182,17 @@ a {
   flex-wrap: wrap;
 }
 
+/* In a table the cell must stay a table cell (display: flex would break the row layout) */
+td.actions {
+  display: table-cell;
+  text-align: right;
+  white-space: nowrap;
+}
+
+td.actions > * + * {
+  margin-left: var(--space-2);
+}
+
 /* ---- tables ---- */
 
 .table-wrap {
@@ -207,6 +218,10 @@ th {
   letter-spacing: 0.04em;
   color: var(--color-muted);
   white-space: nowrap;
+}
+
+td.wide {
+  min-width: 12rem;
 }
 
 th.num {
