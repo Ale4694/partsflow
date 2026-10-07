@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: partsflow
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/partsflow}
+    username: ${DB_USER:partsflow}
+    password: ${DB_PASSWORD:partsflow}
+  jpa:
+    hibernate:
+      # Flyway owns the schema; Hibernate only checks that entities match it
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true

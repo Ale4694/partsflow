@@ -3,11 +3,11 @@
 Milestones are built in order. Each one ends with a passing `./mvnw verify` and a commit.
 
 ## M0 — Foundations
-- [ ] Project skeleton with package-by-feature layout (`catalog`, `inventory`, `invoiceimport`, `ai`, `common`)
-- [ ] `compose.yaml` with PostgreSQL and a healthcheck, `.env.example` (placeholders only), `.gitignore` excluding `.env`
-- [ ] Flyway baseline migration, `spring.jpa.hibernate.ddl-auto=validate`
-- [ ] Global error handling with `@RestControllerAdvice` returning `ProblemDetail`
-- [ ] GitHub Actions workflow running `./mvnw -B verify` on push and pull request
+- [x] Project skeleton with package-by-feature layout (`catalog`, `inventory`, `invoiceimport`, `ai`, `common`)
+- [x] `compose.yaml` with PostgreSQL and a healthcheck, `.env.example` (placeholders only), `.gitignore` excluding `.env`
+- [x] Flyway baseline migration, `spring.jpa.hibernate.ddl-auto=validate`
+- [x] Global error handling with `@RestControllerAdvice` returning `ProblemDetail`
+- [x] GitHub Actions workflow running `./mvnw -B verify` on push and pull request
 
 ## M1 — Catalog
 - [ ] Suppliers (name, VAT number), items (internal code, description, unit, reorder threshold), supplier item codes
