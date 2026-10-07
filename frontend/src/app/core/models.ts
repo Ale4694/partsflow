@@ -17,6 +17,8 @@ export interface ProblemDetail {
   instance?: string;
   /** Stable machine-readable reason, sent by the AI endpoints (AI_KEY_MISSING, AI_REJECTED...). */
   code?: string;
+  /** How long the AI provider asked us to wait, when it said (AI_DAILY_QUOTA_EXHAUSTED, AI_RATE_LIMITED). */
+  retryAfterSeconds?: number;
 }
 
 // ---- catalog ----

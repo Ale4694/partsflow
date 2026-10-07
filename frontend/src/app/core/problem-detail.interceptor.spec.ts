@@ -88,11 +88,9 @@ describe('problemDetailInterceptor', () => {
         503,
         'Il servizio AI ha rifiutato la richiesta. Controlla la chiave e il modello configurati sul server.',
       ],
-      [
-        'AI_TEMPORARILY_UNAVAILABLE',
-        503,
-        'Il servizio AI è sovraccarico o ha esaurito la quota gratuita. Riprova tra un minuto.',
-      ],
+      ['AI_TEMPORARILY_UNAVAILABLE', 503, 'Il servizio AI è momentaneamente sovraccarico. Riprova tra un minuto.'],
+      ['AI_DAILY_QUOTA_EXHAUSTED', 503, 'Quota giornaliera del servizio AI esaurita: riprova più tardi.'],
+      ['AI_RATE_LIMITED', 503, 'Troppe richieste al servizio AI: riprova tra poco.'],
       ['AI_BAD_ANSWER', 502, 'Il servizio AI ha risposto in modo non utilizzabile. Riprova.'],
     ])('translates %s', (code, status, expected) => {
       http.post('/api/ai/assistant', {}).subscribe({ error: () => undefined });
@@ -105,6 +103,24 @@ describe('problemDetailInterceptor', () => {
         );
 
       expect(notifications.notifications()[0].message).toBe(expected);
+    });
+
+    it('tells how long to wait when the provider said so', () => {
+      const answer = (retryAfterSeconds: number, code: string) => {
+        http.post('/api/ai/assistant', {}).subscribe({ error: () => undefined });
+        backend
+          .expectOne('/api/ai/assistant')
+          .flush(
+            { status: 503, code, detail: 'English text', retryAfterSeconds },
+            { status: 503, statusText: 'Service Unavailable' },
+          );
+        return notifications.notifications().at(-1)?.message;
+      };
+
+      expect(answer(32580, 'AI_DAILY_QUOTA_EXHAUSTED')).toBe(
+        'Quota giornaliera del servizio AI esaurita: riprova più tardi (tra circa 9 ore).',
+      );
+      expect(answer(33, 'AI_RATE_LIMITED')).toBe('Troppe richieste al servizio AI: riprova tra 33 secondi.');
     });
 
     it('does not mistake a 503 of the backend for an unreachable server', () => {

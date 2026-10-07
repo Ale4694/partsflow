@@ -1,6 +1,7 @@
 import { HttpContextToken, HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
+import { formatWait } from './format';
 import { NotificationService } from './notification';
 import { ProblemDetail } from './models';
 
@@ -10,13 +11,18 @@ export const SKIP_ERROR_NOTIFICATION = new HttpContextToken<boolean>(() => false
 export const UNREACHABLE_MESSAGE = 'Il server non è raggiungibile, riprova tra qualche secondo.';
 
 /** What to tell the user for each "code" the AI endpoints send (the backend's own text is in English). */
-const AI_MESSAGES: Record<string, string> = {
-  AI_KEY_MISSING: 'Le funzioni AI non sono attive: sul server manca la chiave LLM_API_KEY.',
-  AI_REJECTED:
+const AI_MESSAGES: Record<string, (problem: ProblemDetail) => string> = {
+  AI_KEY_MISSING: () => 'Le funzioni AI non sono attive: sul server manca la chiave LLM_API_KEY.',
+  AI_REJECTED: () =>
     'Il servizio AI ha rifiutato la richiesta. Controlla la chiave e il modello configurati sul server.',
-  AI_TEMPORARILY_UNAVAILABLE:
-    'Il servizio AI è sovraccarico o ha esaurito la quota gratuita. Riprova tra un minuto.',
-  AI_BAD_ANSWER: 'Il servizio AI ha risposto in modo non utilizzabile. Riprova.',
+  AI_DAILY_QUOTA_EXHAUSTED: (problem) =>
+    'Quota giornaliera del servizio AI esaurita: riprova più tardi' +
+    (problem.retryAfterSeconds ? ` (tra ${formatWait(problem.retryAfterSeconds)}).` : '.'),
+  AI_RATE_LIMITED: (problem) =>
+    'Troppe richieste al servizio AI: ' +
+    (problem.retryAfterSeconds ? `riprova tra ${formatWait(problem.retryAfterSeconds)}.` : 'riprova tra poco.'),
+  AI_TEMPORARILY_UNAVAILABLE: () => 'Il servizio AI è momentaneamente sovraccarico. Riprova tra un minuto.',
+  AI_BAD_ANSWER: () => 'Il servizio AI ha risposto in modo non utilizzabile. Riprova.',
 };
 
 /** The ProblemDetail the backend sent, or null when the body is something else (an HTML page from the proxy...). */
@@ -50,7 +56,8 @@ export function problemMessage(error: unknown): string {
   }
   const problem = problemOf(error);
   if (problem) {
-    return (problem.code && AI_MESSAGES[problem.code]) || problem.detail || problem.title || `Errore ${error.status}`;
+    const aiMessage = problem.code ? AI_MESSAGES[problem.code] : undefined;
+    return aiMessage ? aiMessage(problem) : problem.detail || problem.title || `Errore ${error.status}`;
   }
   return `Errore ${error.status}`;
 }

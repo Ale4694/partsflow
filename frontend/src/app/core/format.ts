@@ -34,6 +34,20 @@ export function formatDateTime(value: string | null | undefined): string {
   return value ? dateTimeFormat.format(new Date(value)) : EMPTY;
 }
 
+/** A wait for people: "circa 33 secondi", "circa 12 minuti", "circa 9 ore". */
+export function formatWait(seconds: number): string {
+  const rounded = Math.max(1, Math.round(seconds));
+  if (rounded < 90) {
+    return rounded === 1 ? '1 secondo' : `${rounded} secondi`;
+  }
+  const minutes = Math.round(rounded / 60);
+  if (minutes < 90) {
+    return `circa ${minutes} minuti`;
+  }
+  const hours = Math.round(minutes / 60);
+  return hours === 1 ? 'circa 1 ora' : `circa ${hours} ore`;
+}
+
 @Pipe({ name: 'quantity' })
 export class QuantityPipe implements PipeTransform {
   transform(value: number | null | undefined): string {
