@@ -19,7 +19,7 @@ Operational limits:
 
 - All calls go through one `LlmGateway`: bounded retry with backoff on rate limits, then a clear `503`; one INFO log line per call (operation, outcome, duration, size) **without document content**; and if no API key is configured the model is never called (`503`) while the rest of the application works.
 - Steps are limited: the assistant has a per-question budget of tool calls (default 5), matching handles a limited number of lines per request, and PDFs have page and text length limits.
-- Tests mock the model. An optional eval test measures extraction accuracy on synthetic PDFs, and only runs when an API key is present.
+- Tests mock the model. An optional eval test measures extraction accuracy on synthetic PDFs, and only runs when explicitly requested (`LLM_API_KEY` set and `LLM_EVAL=true`).
 
 ## Alternatives considered
 

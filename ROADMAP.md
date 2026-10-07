@@ -34,7 +34,7 @@ Milestones are built in order. Each one ends with a passing `./mvnw verify` and 
 - [x] Item matching: pg_trgm candidates, LLM picks best or none with justification, user accepts the suggestion
 - [x] Inventory assistant chat endpoint with read-only tools
 - [x] Step limit, LLM call logging without document contents, graceful 503 when the API key is missing or quota is exceeded
-- [x] Model mocked in tests; optional eval test enabled only when `LLM_API_KEY` is set
+- [x] Model mocked in tests; optional eval test, strictly opt-in (`LLM_API_KEY` set and `LLM_EVAL=true`)
 
 ## M5 — Packaging and documentation
 - [x] Multi-stage Dockerfile; full stack runs with `docker compose up`

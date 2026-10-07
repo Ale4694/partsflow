@@ -138,7 +138,14 @@ To run the application from your IDE against the Compose database, start only th
 
 ### The optional LLM accuracy eval
 
-`ExtractionEvalTest` sends a few **synthetic** PDFs to the real Gemini API and prints how many fields were extracted correctly (report in `target/llm-eval-report.txt`). It runs **only when `LLM_API_KEY` is set**, pauses between calls to respect the free-tier rate limit (`EVAL_PAUSE_SECONDS`, default 15), and is skipped otherwise, so CI never calls the LLM. All other tests mock the model. If you keep the key exported in your shell but do not want the eval to run, use `env -u LLM_API_KEY ./mvnw verify`.
+`ExtractionEvalTest` sends a few **synthetic** PDFs to the real Gemini API and prints how many fields were extracted correctly (report in `target/llm-eval-report.txt`). It is **strictly opt-in**: it runs only when **both** `LLM_API_KEY` is set **and** `LLM_EVAL=true`. A plain `./mvnw verify` never calls the LLM, even if `LLM_API_KEY` is exported in your shell, and CI never does either. All other tests mock the model.
+
+```bash
+export LLM_API_KEY=...        # your own key
+LLM_EVAL=true ./mvnw -Dtest=ExtractionEvalTest test
+```
+
+It pauses between calls to respect the free-tier rate limit (`EVAL_PAUSE_SECONDS`, default 15) and takes a couple of minutes. It reports accuracy instead of failing on a low score, so you can compare prompt changes.
 
 ## API overview
 

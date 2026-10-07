@@ -24,19 +24,21 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
 /**
- * Optional accuracy eval against the REAL Gemini API. Disabled unless LLM_API_KEY is set in the environment.
+ * Optional accuracy eval against the REAL Gemini API. Strictly opt-in: it runs only when LLM_API_KEY is set AND
+ * LLM_EVAL=true. A plain {@code ./mvnw verify} never calls the LLM, even if the key is exported in your shell.
  * <p>
  * It sends a handful of synthetic PDFs (no real data) through the same extraction used in production and reports
  * how many fields were extracted correctly. The free tier allows only a few requests per minute, so the test
  * pauses between calls (default 15 s, change with EVAL_PAUSE_SECONDS). It does not fail on a low score: the point
  * is the report, printed and written to target/llm-eval-report.txt, so prompt changes can be compared.
  * <p>
- * Run it deliberately: with the key exported, a normal {@code ./mvnw verify} runs it too. To skip it,
- * run {@code env -u LLM_API_KEY ./mvnw verify}.
+ * Run it deliberately: {@code LLM_EVAL=true ./mvnw -Dtest=ExtractionEvalTest test} with LLM_API_KEY exported.
  */
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
+// Both conditions must hold (JUnit ANDs repeated conditions): a key alone never triggers real calls
 @EnabledIfEnvironmentVariable(named = "LLM_API_KEY", matches = ".+")
+@EnabledIfEnvironmentVariable(named = "LLM_EVAL", matches = "true")
 class ExtractionEvalTest {
 
 	@Autowired
