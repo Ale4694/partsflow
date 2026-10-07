@@ -15,5 +15,20 @@ services:
       timeout: 3s
       retries: 10
 
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-partsflow}
+      DB_USER: ${POSTGRES_USER:-partsflow}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-partsflow}
+      # Passed through from your shell or .env. Empty = the AI endpoints answer 503, everything else works.
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_MODEL: ${LLM_MODEL:-gemini-3.5-flash}
+    ports:
+      - "8080:8080"
+
 volumes:
   db-data:

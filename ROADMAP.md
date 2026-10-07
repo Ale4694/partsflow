@@ -37,9 +37,9 @@ Milestones are built in order. Each one ends with a passing `./mvnw verify` and 
 - [x] Model mocked in tests; optional eval test enabled only when `LLM_API_KEY` is set
 
 ## M5 — Packaging and documentation
-- [ ] Multi-stage Dockerfile; full stack runs with `docker compose up`
-- [ ] README with Mermaid architecture diagram, one-command run, API overview, design decisions, CI badge
-- [ ] Architecture Decision Records in `docs/adr/`
+- [x] Multi-stage Dockerfile; full stack runs with `docker compose up`
+- [x] README with Mermaid architecture diagram, one-command run, API overview, design decisions, CI badge
+- [x] Architecture Decision Records in `docs/adr/`
 
 ## Later / out of scope for now
 - Signed FatturaPA files (`.p7m`)
