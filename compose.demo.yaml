@@ -1,0 +1,9 @@
+# Adds the demo catalog (about 125 invented auto parts, 4 invented suppliers) to the normal stack:
+#
+#   docker compose -f compose.yaml -f compose.demo.yaml up --build
+#
+# It only switches on the Spring profile "demo"; loading is idempotent, so it is safe to start it again.
+services:
+  app:
+    environment:
+      SPRING_PROFILES_ACTIVE: demo

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Synthetic demo data: every company, VAT number and code below is invented. The supplier is part of the demo catalog
+     (docs: README "Semantic search"); the lines use the supplier's own wording and codes that are not mapped yet,
+     so each line waits for review and "Suggerisci abbinamenti" can find the catalog items by meaning. -->
+<p:FatturaElettronica versione="FPR12" xmlns:p="http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/v1.2">
+  <FatturaElettronicaHeader>
+    <DatiTrasmissione>
+      <IdTrasmittente>
+        <IdPaese>IT</IdPaese>
+        <IdCodice>20000000002</IdCodice>
+      </IdTrasmittente>
+      <ProgressivoInvio>00001</ProgressivoInvio>
+      <FormatoTrasmissione>FPR12</FormatoTrasmissione>
+      <CodiceDestinatario>ABC1234</CodiceDestinatario>
+    </DatiTrasmissione>
+    <CedentePrestatore>
+      <DatiAnagrafici>
+        <IdFiscaleIVA>
+          <IdPaese>IT</IdPaese>
+          <IdCodice>20000000002</IdCodice>
+        </IdFiscaleIVA>
+        <Anagrafica>
+          <Denominazione>Autoforniture Bianchi Spa</Denominazione>
+        </Anagrafica>
+        <RegimeFiscale>RF01</RegimeFiscale>
+      </DatiAnagrafici>
+      <Sede>
+        <Indirizzo>Via Inventata 1</Indirizzo>
+        <CAP>00100</CAP>
+        <Comune>Cittafittizia</Comune>
+        <Nazione>IT</Nazione>
+      </Sede>
+    </CedentePrestatore>
+    <CessionarioCommittente>
+      <DatiAnagrafici>
+        <IdFiscaleIVA>
+          <IdPaese>IT</IdPaese>
+          <IdCodice>20000000099</IdCodice>
+        </IdFiscaleIVA>
+        <Anagrafica>
+          <Denominazione>Partsflow Distribuzione Srl</Denominazione>
+        </Anagrafica>
+      </DatiAnagrafici>
+    </CessionarioCommittente>
+  </FatturaElettronicaHeader>
+  <FatturaElettronicaBody>
+    <DatiGenerali>
+      <DatiGeneraliDocumento>
+        <TipoDocumento>TD01</TipoDocumento>
+        <Divisa>EUR</Divisa>
+        <Data>2026-09-15</Data>
+        <Numero>FV-DEMO-001/2026</Numero>
+        <ImportoTotaleDocumento>894.26</ImportoTotaleDocumento>
+      </DatiGeneraliDocumento>
+    </DatiGenerali>
+    <DatiBeniServizi>
+      <DettaglioLinee>
+        <NumeroLinea>1</NumeroLinea>
+        <CodiceArticolo>
+          <CodiceTipo>FORNITORE</CodiceTipo>
+          <CodiceValore>BX-4411</CodiceValore>
+        </CodiceArticolo>
+        <Descrizione>FILTRO OLIO X PANDA 1.2 8V FIRE</Descrizione>
+        <Quantita>12.00000000</Quantita>
+        <UnitaMisura>PZ</UnitaMisura>
+        <PrezzoUnitario>6.500000000</PrezzoUnitario>
+        <PrezzoTotale>78.000000000</PrezzoTotale>
+        <AliquotaIVA>22.00</AliquotaIVA>
+      </DettaglioLinee>
+      <DettaglioLinee>
+        <NumeroLinea>2</NumeroLinea>
+        <CodiceArticolo>
+          <CodiceTipo>FORNITORE</CodiceTipo>
+          <CodiceValore>BX-7730</CodiceValore>
+        </CodiceArticolo>
+        <Descrizione>KIT CINGHIA DISTRIB. + POMPA H2O 1.6 HDI</Descrizione>
+        <Quantita>2.00000000</Quantita>
+        <UnitaMisura>PZ</UnitaMisura>
+        <PrezzoUnitario>118.000000000</PrezzoUnitario>
+        <PrezzoTotale>236.000000000</PrezzoTotale>
+        <AliquotaIVA>22.00</AliquotaIVA>
+      </DettaglioLinee>
+      <DettaglioLinee>
+        <NumeroLinea>3</NumeroLinea>
+        <CodiceArticolo>
+          <CodiceTipo>FORNITORE</CodiceTipo>
+          <CodiceValore>BX-2056</CodiceValore>
+        </CodiceArticolo>
+        <Descrizione>SPAZZOLE TERGI 60 CM (COPPIA) PIATTE</Descrizione>
+        <Quantita>10.00000000</Quantita>
+        <UnitaMisura>PZ</UnitaMisura>
+        <PrezzoUnitario>9.800000000</PrezzoUnitario>
+        <PrezzoTotale>98.000000000</PrezzoTotale>
+        <AliquotaIVA>22.00</AliquotaIVA>
+      </DettaglioLinee>
+      <DettaglioLinee>
+        <NumeroLinea>4</NumeroLinea>
+        <CodiceArticolo>
+          <CodiceTipo>FORNITORE</CodiceTipo>
+          <CodiceValore>BX-3319</CodiceValore>
+        </CodiceArticolo>
+        <Descrizione>PASTIGLIE FRENO ANT. 500/PANDA 1.2 4PZ</Descrizione>
+        <Quantita>6.00000000</Quantita>
+        <UnitaMisura>PZ</UnitaMisura>
+        <PrezzoUnitario>21.500000000</PrezzoUnitario>
+        <PrezzoTotale>129.000000000</PrezzoTotale>
+        <AliquotaIVA>22.00</AliquotaIVA>
+      </DettaglioLinee>
+      <DettaglioLinee>
+        <NumeroLinea>5</NumeroLinea>
+        <CodiceArticolo>
+          <CodiceTipo>FORNITORE</CodiceTipo>
+          <CodiceValore>BX-5871</CodiceValore>
+        </CodiceArticolo>
+        <Descrizione>BATTERIA START&amp;STOP AGM 70 AH</Descrizione>
+        <Quantita>2.00000000</Quantita>
+        <UnitaMisura>PZ</UnitaMisura>
+        <PrezzoUnitario>96.000000000</PrezzoUnitario>
+        <PrezzoTotale>192.000000000</PrezzoTotale>
+        <AliquotaIVA>22.00</AliquotaIVA>
+      </DettaglioLinee>
+      <DatiRiepilogo>
+        <AliquotaIVA>22.00</AliquotaIVA>
+        <ImponibileImporto>733.00</ImponibileImporto>
+        <Imposta>161.26</Imposta>
+        <EsigibilitaIVA>I</EsigibilitaIVA>
+      </DatiRiepilogo>
+    </DatiBeniServizi>
+  </FatturaElettronicaBody>
+</p:FatturaElettronica>

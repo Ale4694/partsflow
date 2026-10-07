@@ -1,0 +1,1288 @@
+{
+ "suppliers": [
+  {
+   "name": "Ricambi Rossi Srl",
+   "vatNumber": "20000000001"
+  },
+  {
+   "name": "Autoforniture Bianchi Spa",
+   "vatNumber": "20000000002"
+  },
+  {
+   "name": "Verdi Ricambi Snc",
+   "vatNumber": "20000000003"
+  },
+  {
+   "name": "Lubrifiltri Neri Srl",
+   "vatNumber": "20000000004"
+  }
+ ],
+ "items": [
+  {
+   "code": "LUB-001",
+   "description": "Olio motore 5W-30 sintetico ACEA C3, latta 5 litri",
+   "unit": "PZ",
+   "reorderThreshold": 10,
+   "stock": 24,
+   "supplierCodes": {
+    "20000000001": "RR-OIL-530",
+    "20000000004": "LN.5W30.5L"
+   }
+  },
+  {
+   "code": "LUB-002",
+   "description": "Olio motore 10W-40 semisintetico benzina/diesel, 5 L",
+   "unit": "PZ",
+   "reorderThreshold": 8,
+   "stock": 16,
+   "supplierCodes": {
+    "20000000004": "LN.10W40.5L",
+    "20000000002": "AB-1040-5"
+   }
+  },
+  {
+   "code": "LUB-003",
+   "description": "Olio motore 0W-20 full synthetic ibride, bidone 4 lt",
+   "unit": "PZ",
+   "reorderThreshold": 6,
+   "stock": 5,
+   "supplierCodes": {
+    "20000000004": "LN.0W20.4L"
+   }
+  },
+  {
+   "code": "LUB-004",
+   "description": "Olio cambio manuale 75W-80 GL-4, 1 litro",
+   "unit": "PZ",
+   "reorderThreshold": 10,
+   "stock": 18,
+   "supplierCodes": {
+    "20000000001": "RR-OIL-7580",
+    "20000000003": "RV/CM7580"
+   }
+  },
+  {
+   "code": "LUB-005",
+   "description": "Olio ATF Dexron VI per cambi automatici, flacone 1 L",
+   "unit": "PZ",
+   "reorderThreshold": 8,
+   "stock": 9,
+   "supplierCodes": {
+    "20000000004": "LN.ATF6.1L"
+   }
+  },
+  {
+   "code": "LUB-006",
+   "description": "Liquido freni DOT 4, flacone 500 ml",
+   "unit": "PZ",
+   "reorderThreshold": 12,
+   "stock": 30,
+   "supplierCodes": {
+    "20000000001": "RR-LF-D4",
+    "20000000002": "AB-LF04"
+   }
+  },
+  {
+   "code": "LUB-007",
+   "description": "Antigelo concentrato -37°C, tanica 5 litri",
+   "unit": "PZ",
+   "reorderThreshold": 6,
+   "stock": 12,
+   "supplierCodes": {
+    "20000000004": "LN.AG37.5L",
+    "20000000002": "AB-AG37"
+   }
+  },
+  {
+   "code": "LUB-008",
+   "description": "Liquido radiatore rosa G12+ pronto all'uso 1,5 L",
+   "unit": "PZ",
+   "reorderThreshold": 10,
+   "stock": 20,
+   "supplierCodes": {
+    "20000000003": "RV/RAD12R"
+   }
+  },
+  {
+   "code": "LUB-009",
+   "description": "Liquido lavacristalli estivo con profumo, tanica 5 L",
+   "unit": "PZ",
+   "reorderThreshold": 10,
+   "stock": 40,
+   "supplierCodes": {
+    "20000000002": "AB-LC05"
+   }
+  },
+  {
+   "code": "LUB-010",
+   "description": "Grasso al litio multiuso in cartuccia da 400 g",
+   "unit": "PZ",
+   "reorderThreshold": 6,
+   "stock": 14,
+   "supplierCodes": {
+    "20000000004": "LN.GL400"
+   }
+  },
+  {
+   "code": "LUB-011",
+   "description": "Additivo pulizia iniettori diesel, flacone 250 ml",
+   "unit": "PZ",
+   "reorderThreshold": 8,
+   "stock": 22,
+   "supplierCodes": {
+    "20000000003": "RV/ADD-IN"
+   }
+  },
+  {
+   "code": "LUB-012",
+   "description": "Spray lubrificante sbloccante multiuso 400 ml",
+   "unit": "PZ",
+   "reorderThreshold": 10,
+   "stock": 35,
+   "supplierCodes": {
+    "20000000002": "AB-SPR40",
+    "20000000001": "RR-SPR-S4"
+   }
+  },
+  {
+   "code": "FLT-001",
+   "description": "Cartuccia lubrificante motore 1.2 FIRE (8v) filtrante in carta",
+   "unit": "PZ",
+   "reorderThreshold": 10,
+   "stock": 14,
+   "supplierCodes": {
+    "20000000004": "LN.F1201",
+    "20000000001": "RR-FO-FIRE"
+   }
+  },
+  {
+   "code": "FLT-002",
+   "description": "Filtro olio avvitabile M20x1,5 h 85 mm per benzina 1.0-1.4",
+   "unit": "PZ",
+   "reorderThreshold": 12,
+   "stock": 30,
+   "supplierCodes": {
+    "20000000004": "LN.FO85"
+   }
+  },
+  {
+   "code": "FLT-003",
+   "description": "Filtro olio a cartuccia gruppo VAG 1.6/2.0 TDI",
+   "unit": "PZ",
+   "reorderThreshold": 8,
+   "stock": 11,
+   "supplierCodes": {
+    "20000000003": "RV/FOC-VAG"
+   }
+  },
+  {
+   "code": "FLT-004",
+   "description": "Filtro aria motore 1.3 Multijet 75/95 CV",
+   "unit": "PZ",
+   "reorderThreshold": 8,
+   "stock": 10,
+   "supplierCodes": {
+    "20000000002": "AB-FA13MJ",
+    "20000000001": "RR-FA-13"
+   }
+  },
+  {
+   "code": "FLT-005",
+   "description": "Filtro abitacolo ai carboni attivi antipolline",
+   "unit": "PZ",
+   "reorderThreshold": 10,
+   "stock": 26,
+   "supplierCodes": {
+    "20000000002": "AB-FAB-CA",
+    "20000000003": "RV/FP-C"
+   }
+  },
+  {
+   "code": "FLT-006",
+   "description": "Filtro gasolio con sede per sensore acqua, 1.5 dCi",
+   "unit": "PZ",
+   "reorderThreshold": 6,
+   "stock": 7,
+   "supplierCodes": {
+    "20000000004": "LN.FG15"
+   }
+  },
+  {
+   "code": "FLT-007",
+   "description": "Filtro aria sportivo lavabile a cono, imbocco 60 mm",
+   "unit": "PZ",
+   "reorderThreshold": 2,
+   "stock": 1,
+   "supplierCodes": {
+    "20000000003": "RV/SPORT60"
+   }
+  },
+  {
+   "code": "FLT-008",
+   "description": "Filtro carburante benzina in linea con raccordi rapidi",
+   "unit": "PZ",
+   "reorderThreshold": 6,
+   "stock": 9,
+   "supplierCodes": {
+    "20000000001": "RR-FB-IN"
+   }
+  },
+  {
+   "code": "FLT-009",
+   "description": "Filtro olio cambio automatico con guarnizione",
+   "unit": "PZ",
+   "reorderThreshold": 4,
+   "stock": 3,
+   "supplierCodes": {
+    "20000000004": "LN.FCA"
+   }
+  },
+  {
+   "code": "FLT-010",
+   "description": "Filtro antiparticolato FAP, universale 2.0 diesel",
+   "unit": "PZ",
+   "reorderThreshold": 1,
+   "stock": 1,
+   "supplierCodes": {
+    "20000000003": "RV/FAP20"
+   }
+  },
+  {
+   "code": "FRE-001",
+   "description": "Pastiglie freno anteriori Panda 1.2 (kit 4 pz)",
+   "unit": "KIT",
+   "reorderThreshold": 8,
+   "stock": 17,
+   "supplierCodes": {
+    "20000000001": "RR-BRK-001",
+    "20000000002": "AB-PF-PAN"
+   }
+  },
+  {
+   "code": "FRE-002",
+   "description": "Ferodi posteriori a tamburo ganasce 200x40, serie completa",
+   "unit": "KIT",
+   "reorderThreshold": 4,
+   "stock": 6,
+   "supplierCodes": {
+    "20000000002": "AB-FG200"
+   }
+  },
+  {
+   "code": "FRE-003",
+   "description": "Dischi freno anteriori ventilati Ø 257 mm, coppia",
+   "unit": "COP",
+   "reorderThreshold": 4,
+   "stock": 8,
+   "supplierCodes": {
+    "20000000001": "RR-DF-257",
+    "20000000003": "RV/DISC257"
+   }
+  },
+  {
+   "code": "FRE-004",
+   "description": "Dischi freno posteriori pieni Ø 240 mm, coppia",
+   "unit": "COP",
+   "reorderThreshold": 4,
+   "stock": 5,
+   "supplierCodes": {
+    "20000000003": "RV/DISC240P"
+   }
+  },
+  {
+   "code": "FRE-005",
+   "description": "Kit pastiglie e dischi anteriori Fiat 500 1.2",
+   "unit": "KIT",
+   "reorderThreshold": 3,
+   "stock": 4,
+   "supplierCodes": {
+    "20000000001": "RR-KPD-500"
+   }
+  },
+  {
+   "code": "FRE-006",
+   "description": "Pastiglie freno post. con sensore usura, berlina/SW",
+   "unit": "KIT",
+   "reorderThreshold": 6,
+   "stock": 9,
+   "supplierCodes": {
+    "20000000002": "AB-PFP-SU"
+   }
+  },
+  {
+   "code": "FRE-007",
+   "description": "Tubo freno flessibile anteriore, lunghezza 380 mm",
+   "unit": "PZ",
+   "reorderThreshold": 6,
+   "stock": 12,
+   "supplierCodes": {
+    "20000000003": "RV/TF380"
+   }
+  },
+  {
+   "code": "FRE-008",
+   "description": "Cilindretto ruota posteriore Ø 19,05",
+   "unit": "PZ",
+   "reorderThreshold": 4,
+   "stock": 4,
+   "supplierCodes": {
+    "20000000001": "RR-CIL-19"
+   }
+  },
+  {
+   "code": "FRE-009",
+   "description": "Pinza freno anteriore destra rigenerata, scambio",
+   "unit": "PZ",
+   "reorderThreshold": 2,
+   "stock": 2,
+   "supplierCodes": {
+    "20000000002": "AB-PZ-DX"
+   }
+  },
+  {
+   "code": "FRE-010",
+   "description": "Sensore usura pastiglie anteriore, cavo 400 mm",
+   "unit": "PZ",
+   "reorderThreshold": 6,
+   "stock": 10,
+   "supplierCodes": {
+    "20000000003": "RV/SU-A"
+   }
+  },
+  {
+   "code": "FRE-011",
+   "description": "Servofreno a depressione con pompa, ricondizionato",
+   "unit": "PZ",
+   "reorderThreshold": 1,
+   "stock": 1,
+   "supplierCodes": {
+    "20000000002": "AB-SERVO"
+   }
+  },
+  {
+   "code": "FRE-012",
+   "description": "Pompa freni tandem con serbatoio Ø 20,6",
+   "unit": "PZ",
+   "reorderThreshold": 2,
+   "stock": 2,
+   "supplierCodes": {
+    "20000000001": "RR-PF-20"
+   }
+  },
+  {
+   "code": "MOT-001",
+   "description": "Kit distribuzione cinghia + tenditore + pompa acqua 1.6 HDi",
+   "unit": "KIT",
+   "reorderThreshold": 3,
+   "stock": 5,
+   "supplierCodes": {
+    "20000000001": "RR-KD-16HDI",
+    "20000000002": "AB-KDP16"
+   }
+  },
+  {
+   "code": "MOT-002",
+   "description": "Cinghia servizi poly-V 6PK1195 per alternatore/clima",
+   "unit": "PZ",
+   "reorderThreshold": 6,
+   "stock": 8,
+   "supplierCodes": {
+    "20000000003": "RV/6PK1195"
+   }
+  },
+  {
+   "code": "MOT-003",
+   "description": "Candela accensione elettrodo iridio, filetto 14 mm",
+   "unit": "PZ",
+   "reorderThreshold": 16,
+   "stock": 40,
+   "supplierCodes": {
+    "20000000004": "LN.CAND-IR",
+    "20000000002": "AB-CI14"
+   }
+  },
+  {
+   "code": "MOT-004",
+   "description": "Candeletta preriscaldamento diesel 11 V",
+   "unit": "PZ",
+   "reorderThreshold": 12,
+   "stock": 20,
+   "supplierCodes": {
+    "20000000003": "RV/CAN-D11"
+   }
+  },
+  {
+   "code": "MOT-005",
+   "description": "Bobina accensione a matita 12V per motori 1.4 16v",
+   "unit": "PZ",
+   "reorderThreshold": 4,
+   "stock": 6,
+   "supplierCodes": {
+    "20000000001": "RR-BOB-14"
+   }
+  },
+  {
+   "code": "MOT-006",
+   "description": "Guarnizione testata multistrato spessore 1,3",
+   "unit": "PZ",
+   "reorderThreshold": 2,
+   "stock": 3,
+   "supplierCodes": {
+    "20000000002": "AB-GT13"
+   }
+  },
+  {
+   "code": "MOT-007",
+   "description": "Guarnizione coppa olio in silicone",
+   "unit": "PZ",
+   "reorderThreshold": 4,
+   "stock": 7,
+   "supplierCodes": {
+    "20000000003": "RV/GCO"
+   }
+  },
+  {
+   "code": "MOT-008",
+   "description": "Termostato 87°C completo di guarnizione",
+   "unit": "PZ",
+   "reorderThreshold": 4,
+   "stock": 6,
+   "supplierCodes": {
+    "20000000001": "RR-TERM87"
+   }
+  },
+  {
+   "code": "MOT-009",
+   "description": "Pompa acqua con girante metallica",
+   "unit": "PZ",
+   "reorderThreshold": 3,
+   "stock": 3,
+   "supplierCodes": {
+    "20000000002": "AB-PA-MET"
+   }
+  },
+  {
+   "code": "MOT-010",
+   "description": "Radiatore acqua in alluminio 600x400 mm",
+   "unit": "PZ",
+   "reorderThreshold": 2,
+   "stock": 2,
+   "supplierCodes": {
+    "20000000003": "RV/RAD64"
+   }
+  },
+  {
+   "code": "MOT-011",
+   "description": "Tappo vaschetta espansione 1,4 bar",
+   "unit": "PZ",
+   "reorderThreshold": 6,
+   "stock": 11,
+   "supplierCodes": {
+    "20000000001": "RR-TAPPO14"
+   }
+  },
+  {
+   "code": "MOT-012",
+   "description": "Tendicinghia automatico per cinghia servizi",
+   "unit": "PZ",
+   "reorderThreshold": 3,
+   "stock": 4,
+   "supplierCodes": {
+    "20000000002": "AB-TC-AUTO"
+   }
+  },
+  {
+   "code": "MOT-013",
+   "description": "Sonda lambda a 4 fili, connettore universale",
+   "unit": "PZ",
+   "reorderThreshold": 3,
+   "stock": 3,
+   "supplierCodes": {
+    "20000000004": "LN.LAMBDA4"
+   }
+  },
+  {
+   "code": "MOT-014",
+   "description": "Supporto motore lato distribuzione in gomma-metallo",
+   "unit": "PZ",
+   "reorderThreshold": 2,
+   "stock": 3,
+   "supplierCodes": {
+    "20000000003": "RV/SM-DIS"
+   }
+  },
+  {
+   "code": "MOT-015",
+   "description": "Pistoni con fasce e spinotti, maggiorazione 0,5 (set 4)",
+   "unit": "SET",
+   "reorderThreshold": 1,
+   "stock": 1,
+   "supplierCodes": {
+    "20000000002": "AB-PIST05"
+   }
+  },
+  {
+   "code": "SOS-001",
+   "description": "Ammortizzatore anteriore a gas, destro/sinistro",
+   "unit": "PZ",
+   "reorderThreshold": 6,
+   "stock": 10,
+   "supplierCodes": {
+    "20000000002": "AB-AMM-AG",
+    "20000000001": "RR-AMM-A"
+   }
+  },
+  {
+   "code": "SOS-002",
+   "description": "Ammortizzatore posteriore bitubo",
+   "unit": "PZ",
+   "reorderThreshold": 6,
+   "stock": 8,
+   "supplierCodes": {
+    "20000000003": "RV/AMM-PB"
+   }
+  },
+  {
+   "code": "SOS-003",
+   "description": "Molla elicoidale anteriore rinforzata",
+   "unit": "PZ",
+   "reorderThreshold": 2,
+   "stock": 3,
+   "supplierCodes": {
+    "20000000001": "RR-MOL-AR"
+   }
+  },
+  {
+   "code": "SOS-004",
+   "description": "Kit cuffia parapolvere e tamponi di fine corsa",
+   "unit": "KIT",
+   "reorderThreshold": 4,
+   "stock": 7,
+   "supplierCodes": {
+    "20000000002": "AB-KCT"
+   }
+  },
+  {
+   "code": "SOS-005",
+   "description": "Braccetto oscillante inferiore ant. sx con boccole",
+   "unit": "PZ",
+   "reorderThreshold": 3,
+   "stock": 4,
+   "supplierCodes": {
+    "20000000003": "RV/BR-SX"
+   }
+  },
+  {
+   "code": "SOS-006",
+   "description": "Testina sterzo esterna filetto sinistro",
+   "unit": "PZ",
+   "reorderThreshold": 4,
+   "stock": 6,
+   "supplierCodes": {
+    "20000000001": "RR-TS-ES"
+   }
+  },
+  {
+   "code": "SOS-007",
+   "description": "Tirante barra sterzo interno M16x1,5",
+   "unit": "PZ",
+   "reorderThreshold": 4,
+   "stock": 5,
+   "supplierCodes": {
+    "20000000002": "AB-TIR16"
+   }
+  },
+  {
+   "code": "SOS-008",
+   "description": "Cuscinetto ruota anteriore con anello ABS, Ø 72",
+   "unit": "PZ",
+   "reorderThreshold": 4,
+   "stock": 7,
+   "supplierCodes": {
+    "20000000003": "RV/CUS72"
+   }
+  },
+  {
+   "code": "SOS-009",
+   "description": "Supporto ammortizzatore con cuscinetto",
+   "unit": "PZ",
+   "reorderThreshold": 4,
+   "stock": 5,
+   "supplierCodes": {
+    "20000000001": "RR-SUP-AM"
+   }
+  },
+  {
+   "code": "SOS-010",
+   "description": "Biellette barra stabilizzatrice, coppia",
+   "unit": "COP",
+   "reorderThreshold": 4,
+   "stock": 6,
+   "supplierCodes": {
+    "20000000002": "AB-BIEL"
+   }
+  },
+  {
+   "code": "SOS-011",
+   "description": "Silent block bracci posteriori, kit 2 pz",
+   "unit": "KIT",
+   "reorderThreshold": 3,
+   "stock": 4,
+   "supplierCodes": {
+    "20000000003": "RV/SB-P"
+   }
+  },
+  {
+   "code": "SOS-012",
+   "description": "Scatola sterzo a cremagliera rigenerata",
+   "unit": "PZ",
+   "reorderThreshold": 1,
+   "stock": 1,
+   "supplierCodes": {
+    "20000000002": "AB-SCAT"
+   }
+  },
+  {
+   "code": "ELE-001",
+   "description": "Accumulatore 12V 60Ah 540A, spunto avviamento",
+   "unit": "PZ",
+   "reorderThreshold": 4,
+   "stock": 7,
+   "supplierCodes": {
+    "20000000001": "RR-BAT-60",
+    "20000000003": "RV/ACC60"
+   }
+  },
+  {
+   "code": "ELE-002",
+   "description": "Batteria AGM 12V 70Ah per veicoli con start&stop",
+   "unit": "PZ",
+   "reorderThreshold": 3,
+   "stock": 2,
+   "supplierCodes": {
+    "20000000002": "AB-BAT-AGM70"
+   }
+  },
+  {
+   "code": "ELE-003",
+   "description": "Lampada alogena H7 12V 55W, confezione 2 pezzi",
+   "unit": "CF",
+   "reorderThreshold": 12,
+   "stock": 32,
+   "supplierCodes": {
+    "20000000003": "RV/H7-2"
+   }
+  },
+  {
+   "code": "ELE-004",
+   "description": "Lampadina H4 60/55W faro anabbagliante/abbagliante",
+   "unit": "PZ",
+   "reorderThreshold": 12,
+   "stock": 28,
+   "supplierCodes": {
+    "20000000001": "RR-LAMP-H4"
+   }
+  },
+  {
+   "code": "ELE-005",
+   "description": "Lampadina P21W a baionetta per stop/retromarcia",
+   "unit": "PZ",
+   "reorderThreshold": 20,
+   "stock": 55,
+   "supplierCodes": {
+    "20000000002": "AB-P21W"
+   }
+  },
+  {
+   "code": "ELE-006",
+   "description": "Kit lampade LED H7 canbus, coppia",
+   "unit": "COP",
+   "reorderThreshold": 4,
+   "stock": 6,
+   "supplierCodes": {
+    "20000000003": "RV/LED-H7"
+   }
+  },
+  {
+   "code": "ELE-007",
+   "description": "Assortimento fusibili a lama 5-30A (scatola 120 pz)",
+   "unit": "SC",
+   "reorderThreshold": 4,
+   "stock": 9,
+   "supplierCodes": {
+    "20000000001": "RR-FUS-120"
+   }
+  },
+  {
+   "code": "ELE-008",
+   "description": "Relè 12V 40A 5 poli con staffa",
+   "unit": "PZ",
+   "reorderThreshold": 8,
+   "stock": 15,
+   "supplierCodes": {
+    "20000000002": "AB-REL40"
+   }
+  },
+  {
+   "code": "ELE-009",
+   "description": "Alternatore 12V 120A, scambio rigenerato",
+   "unit": "PZ",
+   "reorderThreshold": 2,
+   "stock": 2,
+   "supplierCodes": {
+    "20000000003": "RV/ALT120"
+   }
+  },
+  {
+   "code": "ELE-010",
+   "description": "Motorino avviamento 1,1 kW pignone 9 denti",
+   "unit": "PZ",
+   "reorderThreshold": 2,
+   "stock": 2,
+   "supplierCodes": {
+    "20000000001": "RR-MAV-11"
+   }
+  },
+  {
+   "code": "ELE-011",
+   "description": "Spazzole tergicristallo piatte 600 mm, coppia",
+   "unit": "COP",
+   "reorderThreshold": 8,
+   "stock": 16,
+   "supplierCodes": {
+    "20000000002": "AB-TERGI60",
+    "20000000001": "RR-WIP-600"
+   }
+  },
+  {
+   "code": "ELE-012",
+   "description": "Spazzola tergilunotto 300 mm con adattatore",
+   "unit": "PZ",
+   "reorderThreshold": 6,
+   "stock": 10,
+   "supplierCodes": {
+    "20000000003": "RV/TL300"
+   }
+  },
+  {
+   "code": "ELE-013",
+   "description": "Pompa lavavetri anteriore 12V",
+   "unit": "PZ",
+   "reorderThreshold": 4,
+   "stock": 5,
+   "supplierCodes": {
+    "20000000001": "RR-PLV"
+   }
+  },
+  {
+   "code": "ELE-014",
+   "description": "Faro anteriore destro alogeno con motorino regolazione",
+   "unit": "PZ",
+   "reorderThreshold": 2,
+   "stock": 2,
+   "supplierCodes": {
+    "20000000002": "AB-FARO-DX"
+   }
+  },
+  {
+   "code": "ELE-015",
+   "description": "Interruttore alzacristalli lato guida, 6 pin",
+   "unit": "PZ",
+   "reorderThreshold": 3,
+   "stock": 4,
+   "supplierCodes": {
+    "20000000003": "RV/ALZ-6"
+   }
+  },
+  {
+   "code": "CAR-001",
+   "description": "Specchietto retrovisore sinistro elettrico termico",
+   "unit": "PZ",
+   "reorderThreshold": 3,
+   "stock": 3,
+   "supplierCodes": {
+    "20000000002": "AB-SPEC-SX"
+   }
+  },
+  {
+   "code": "CAR-002",
+   "description": "Paraurti anteriore verniciabile con griglie",
+   "unit": "PZ",
+   "reorderThreshold": 1,
+   "stock": 1,
+   "supplierCodes": {
+    "20000000003": "RV/PARA-A"
+   }
+  },
+  {
+   "code": "CAR-003",
+   "description": "Tappetini in gomma su misura, set 4 pezzi",
+   "unit": "SET",
+   "reorderThreshold": 4,
+   "stock": 8,
+   "supplierCodes": {
+    "20000000001": "RR-TAPP-4"
+   }
+  },
+  {
+   "code": "CAR-004",
+   "description": "Catene da neve a rombo gruppo 9 mm",
+   "unit": "COP",
+   "reorderThreshold": 3,
+   "stock": 5,
+   "supplierCodes": {
+    "20000000002": "AB-CAT9"
+   }
+  },
+  {
+   "code": "CAR-005",
+   "description": "Kit sicurezza triangolo e giubbotto alta visibilità",
+   "unit": "KIT",
+   "reorderThreshold": 10,
+   "stock": 18,
+   "supplierCodes": {
+    "20000000003": "RV/KSIC"
+   }
+  },
+  {
+   "code": "CAR-006",
+   "description": "Vernice spray nera opaca per ritocchi 400 ml",
+   "unit": "PZ",
+   "reorderThreshold": 8,
+   "stock": 12,
+   "supplierCodes": {
+    "20000000001": "RR-VER-NO"
+   }
+  },
+  {
+   "code": "CAR-007",
+   "description": "Gomma termica M+S 195/65R15 91T",
+   "unit": "PZ",
+   "reorderThreshold": 8,
+   "stock": 12,
+   "supplierCodes": {
+    "20000000002": "AB-INV-1965"
+   }
+  },
+  {
+   "code": "CAR-008",
+   "description": "Pneumatico estivo 205/55 R16 91V",
+   "unit": "PZ",
+   "reorderThreshold": 8,
+   "stock": 16,
+   "supplierCodes": {
+    "20000000003": "RV/EST-2055"
+   }
+  },
+  {
+   "code": "CAR-009",
+   "description": "Cerchio in lega 6Jx15 ET40 foratura 4x98",
+   "unit": "PZ",
+   "reorderThreshold": 4,
+   "stock": 4,
+   "supplierCodes": {
+    "20000000001": "RR-LEGA15"
+   }
+  },
+  {
+   "code": "CAR-010",
+   "description": "Bulloni ruota conici M12x1,25 (set 20)",
+   "unit": "SET",
+   "reorderThreshold": 6,
+   "stock": 10,
+   "supplierCodes": {
+    "20000000002": "AB-BUL12"
+   }
+  },
+  {
+   "code": "CAR-011",
+   "description": "Valvola gonfiaggio in gomma con tappo, 10 pezzi",
+   "unit": "CF",
+   "reorderThreshold": 6,
+   "stock": 14,
+   "supplierCodes": {
+    "20000000003": "RV/VAL10"
+   }
+  },
+  {
+   "code": "CAR-012",
+   "description": "Portapacchi universale in alluminio con barre 120 cm",
+   "unit": "PZ",
+   "reorderThreshold": 2,
+   "stock": 2,
+   "supplierCodes": {
+    "20000000001": "RR-PORT120"
+   }
+  },
+  {
+   "code": "CAR-013",
+   "description": "Parafango anteriore destro in lamiera zincata",
+   "unit": "PZ",
+   "reorderThreshold": 1,
+   "stock": 1,
+   "supplierCodes": {
+    "20000000002": "AB-PARAF-D"
+   }
+  },
+  {
+   "code": "CAR-014",
+   "description": "Cofano motore verniciabile",
+   "unit": "PZ",
+   "reorderThreshold": 1,
+   "stock": 0,
+   "supplierCodes": {
+    "20000000003": "RV/COF"
+   }
+  },
+  {
+   "code": "SCA-001",
+   "description": "Marmitta posteriore a silenziatore, uscita singola",
+   "unit": "PZ",
+   "reorderThreshold": 2,
+   "stock": 3,
+   "supplierCodes": {
+    "20000000001": "RR-MARM-P"
+   }
+  },
+  {
+   "code": "SCA-002",
+   "description": "Catalizzatore omologato Euro 5 benzina",
+   "unit": "PZ",
+   "reorderThreshold": 1,
+   "stock": 1,
+   "supplierCodes": {
+    "20000000002": "AB-CAT-E5"
+   }
+  },
+  {
+   "code": "SCA-003",
+   "description": "Fascetta di fissaggio scarico Ø 50 mm, 4 pezzi",
+   "unit": "CF",
+   "reorderThreshold": 8,
+   "stock": 20,
+   "supplierCodes": {
+    "20000000003": "RV/FAS50"
+   }
+  },
+  {
+   "code": "SCA-004",
+   "description": "Flessibile scarico in acciaio 45x200 mm",
+   "unit": "PZ",
+   "reorderThreshold": 3,
+   "stock": 4,
+   "supplierCodes": {
+    "20000000001": "RR-FLEX45"
+   }
+  },
+  {
+   "code": "SCA-005",
+   "description": "Guarnizione collettore di scarico in grafite",
+   "unit": "PZ",
+   "reorderThreshold": 5,
+   "stock": 8,
+   "supplierCodes": {
+    "20000000002": "AB-GCS"
+   }
+  },
+  {
+   "code": "SCA-006",
+   "description": "Silenziatore centrale per diesel 1.9",
+   "unit": "PZ",
+   "reorderThreshold": 2,
+   "stock": 2,
+   "supplierCodes": {
+    "20000000003": "RV/SIL-C"
+   }
+  },
+  {
+   "code": "CLI-001",
+   "description": "Compressore climatizzatore a pistoni 7SEU16C",
+   "unit": "PZ",
+   "reorderThreshold": 1,
+   "stock": 1,
+   "supplierCodes": {
+    "20000000001": "RR-COMP-7"
+   }
+  },
+  {
+   "code": "CLI-002",
+   "description": "Condensatore climatizzazione in alluminio",
+   "unit": "PZ",
+   "reorderThreshold": 2,
+   "stock": 2,
+   "supplierCodes": {
+    "20000000002": "AB-COND"
+   }
+  },
+  {
+   "code": "CLI-003",
+   "description": "Gas refrigerante R134a, bombola 500 g",
+   "unit": "PZ",
+   "reorderThreshold": 6,
+   "stock": 10,
+   "supplierCodes": {
+    "20000000003": "RV/R134-500"
+   }
+  },
+  {
+   "code": "CLI-004",
+   "description": "Filtro disidratatore con valvola di servizio",
+   "unit": "PZ",
+   "reorderThreshold": 3,
+   "stock": 4,
+   "supplierCodes": {
+    "20000000001": "RR-DISID"
+   }
+  },
+  {
+   "code": "CLI-005",
+   "description": "Pulitore igienizzante spray per impianto clima",
+   "unit": "PZ",
+   "reorderThreshold": 8,
+   "stock": 15,
+   "supplierCodes": {
+    "20000000002": "AB-IGIEN"
+   }
+  },
+  {
+   "code": "CLI-006",
+   "description": "Radiatore riscaldamento abitacolo a lamelle",
+   "unit": "PZ",
+   "reorderThreshold": 2,
+   "stock": 2,
+   "supplierCodes": {
+    "20000000003": "RV/RISC"
+   }
+  },
+  {
+   "code": "TRA-001",
+   "description": "Kit frizione 3 pezzi con cuscinetto reggispinta Ø 200",
+   "unit": "KIT",
+   "reorderThreshold": 2,
+   "stock": 3,
+   "supplierCodes": {
+    "20000000001": "RR-KF-200"
+   }
+  },
+  {
+   "code": "TRA-002",
+   "description": "Volano bimassa riconosciuto per 1.9 TDI",
+   "unit": "PZ",
+   "reorderThreshold": 1,
+   "stock": 1,
+   "supplierCodes": {
+    "20000000002": "AB-VOL-19"
+   }
+  },
+  {
+   "code": "TRA-003",
+   "description": "Cuscinetto reggispinta idraulico concentrico",
+   "unit": "PZ",
+   "reorderThreshold": 2,
+   "stock": 3,
+   "supplierCodes": {
+    "20000000003": "RV/REGG"
+   }
+  },
+  {
+   "code": "TRA-004",
+   "description": "Semiasse sinistro con giunto omocinetico",
+   "unit": "PZ",
+   "reorderThreshold": 2,
+   "stock": 2,
+   "supplierCodes": {
+    "20000000001": "RR-SEMI-SX"
+   }
+  },
+  {
+   "code": "TRA-005",
+   "description": "Cuffia semiasse lato ruota con fascette e grasso",
+   "unit": "KIT",
+   "reorderThreshold": 6,
+   "stock": 9,
+   "supplierCodes": {
+    "20000000002": "AB-CUFFIA"
+   }
+  },
+  {
+   "code": "TRA-006",
+   "description": "Cavo frizione regolabile automatico, lunghezza 1100 mm",
+   "unit": "PZ",
+   "reorderThreshold": 3,
+   "stock": 5,
+   "supplierCodes": {
+    "20000000003": "RV/CAVOF"
+   }
+  },
+  {
+   "code": "TRA-007",
+   "description": "Giunto omocinetico lato cambio, 26 scanalature",
+   "unit": "PZ",
+   "reorderThreshold": 2,
+   "stock": 2,
+   "supplierCodes": {
+    "20000000001": "RR-GIU-26"
+   }
+  },
+  {
+   "code": "UTE-001",
+   "description": "Chiave dinamometrica a scatto 1/2\" 40-210 Nm",
+   "unit": "PZ",
+   "reorderThreshold": 1,
+   "stock": 2,
+   "supplierCodes": {
+    "20000000002": "AB-DINAMO"
+   }
+  },
+  {
+   "code": "UTE-002",
+   "description": "Cric a bottiglia idraulico 2 tonnellate",
+   "unit": "PZ",
+   "reorderThreshold": 2,
+   "stock": 3,
+   "supplierCodes": {
+    "20000000003": "RV/CRIC2"
+   }
+  },
+  {
+   "code": "UTE-003",
+   "description": "Cavi di avviamento 400A, lunghezza 3 metri",
+   "unit": "PZ",
+   "reorderThreshold": 4,
+   "stock": 7,
+   "supplierCodes": {
+    "20000000001": "RR-CAVI400"
+   }
+  },
+  {
+   "code": "UTE-004",
+   "description": "Fascette stringitubo in acciaio Ø 20-32, 10 pz",
+   "unit": "CF",
+   "reorderThreshold": 10,
+   "stock": 24,
+   "supplierCodes": {
+    "20000000002": "AB-STR2032"
+   }
+  },
+  {
+   "code": "UTE-005",
+   "description": "Nastro isolante in PVC nero 19 mm x 20 m",
+   "unit": "PZ",
+   "reorderThreshold": 20,
+   "stock": 48,
+   "supplierCodes": {
+    "20000000003": "RV/NIS19"
+   }
+  },
+  {
+   "code": "UTE-006",
+   "description": "Guanti da officina in nitrile, scatola 100",
+   "unit": "SC",
+   "reorderThreshold": 6,
+   "stock": 11,
+   "supplierCodes": {
+    "20000000001": "RR-GUANTI"
+   }
+  },
+  {
+   "code": "UTE-007",
+   "description": "Straccio multiuso industriale, confezione 1 kg",
+   "unit": "CF",
+   "reorderThreshold": 10,
+   "stock": 18,
+   "supplierCodes": {
+    "20000000002": "AB-STR1K"
+   }
+  },
+  {
+   "code": "UTE-008",
+   "description": "Sigillante siliconico per guarnizioni rosso, 85 g",
+   "unit": "PZ",
+   "reorderThreshold": 8,
+   "stock": 13,
+   "supplierCodes": {
+    "20000000003": "RV/SIG-R"
+   }
+  },
+  {
+   "code": "VAR-001",
+   "description": "Kit tendicinghia e rulli per cinghia servizi con clima",
+   "unit": "KIT",
+   "reorderThreshold": 3,
+   "stock": 4,
+   "supplierCodes": {
+    "20000000001": "RR-KTR-C"
+   }
+  },
+  {
+   "code": "VAR-002",
+   "description": "Sensore ABS ruota anteriore sinistra",
+   "unit": "PZ",
+   "reorderThreshold": 4,
+   "stock": 5,
+   "supplierCodes": {
+    "20000000002": "AB-ABS-AS"
+   }
+  },
+  {
+   "code": "VAR-003",
+   "description": "Sensore temperatura liquido refrigerante, 2 poli",
+   "unit": "PZ",
+   "reorderThreshold": 5,
+   "stock": 8,
+   "supplierCodes": {
+    "20000000003": "RV/TEMP2"
+   }
+  },
+  {
+   "code": "VAR-004",
+   "description": "Elettroventola radiatore 300 mm con supporto",
+   "unit": "PZ",
+   "reorderThreshold": 2,
+   "stock": 2,
+   "supplierCodes": {
+    "20000000001": "RR-VENT30"
+   }
+  },
+  {
+   "code": "VAR-005",
+   "description": "Pompa carburante elettrica ad immersione",
+   "unit": "PZ",
+   "reorderThreshold": 2,
+   "stock": 3,
+   "supplierCodes": {
+    "20000000002": "AB-PCARB"
+   }
+  },
+  {
+   "code": "VAR-006",
+   "description": "Debimetro aria con connettore a 5 pin",
+   "unit": "PZ",
+   "reorderThreshold": 2,
+   "stock": 2,
+   "supplierCodes": {
+    "20000000003": "RV/DEB5"
+   }
+  },
+  {
+   "code": "VAR-007",
+   "description": "Cinghia trapezoidale AVX10x900 per ventola",
+   "unit": "PZ",
+   "reorderThreshold": 5,
+   "stock": 9,
+   "supplierCodes": {
+    "20000000001": "RR-AVX900"
+   }
+  },
+  {
+   "code": "VAR-008",
+   "description": "Tubo flessibile radiatore superiore in gomma armata",
+   "unit": "PZ",
+   "reorderThreshold": 4,
+   "stock": 6,
+   "supplierCodes": {
+    "20000000002": "AB-TUBO-S"
+   }
+  }
+ ]
+}
