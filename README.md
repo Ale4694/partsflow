@@ -151,8 +151,14 @@ The AI features need a language model. Two kinds of provider are supported, chos
 
 ```bash
 export LLM_API_KEY=...                  # your own key
-# export LLM_MODEL=gemini-2.5-flash     # optional: another model has its own daily allowance
+# export LLM_MODEL=gemini-3.7-flash     # optional: another model has its own daily allowance (or gemini-3.8-flash)
 docker compose up --build
+```
+
+Available model names change over time, and older ones stop being offered to new users. To see the models your key can use, list them with the models endpoint:
+
+```bash
+curl -s -H "x-goog-api-key: $LLM_API_KEY" https://generativelanguage.googleapis.com/v1beta/models
 ```
 
 **Any OpenAI-compatible service** (OpenAI, Mistral, Groq, DeepSeek, OpenRouter, a local server...):
